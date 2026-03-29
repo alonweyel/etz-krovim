@@ -1,0 +1,57 @@
+<div class="app-container" dir="rtl">
+  
+  <!-- Search Bar -->
+  <div class="search-panel">
+    <div class="search-input-group">
+      <input 
+        type="text" 
+        [formControl]="searchControl" 
+        placeholder="הכנס תעודת זהות לחיפוש..." 
+        class="search-input"
+        (keyup.enter)="onSearch()"
+      >
+      <button 
+        (click)="onSearch()" 
+        class="search-btn"
+        [disabled]="isLoading()"
+      >
+        @if (isLoading()) {
+          <span class="spinner"></span>
+        } @else {
+          חיפוש
+        }
+      </button>
+    </div>
+  </div>
+
+  <!-- Data Toggle Controls -->
+  @if (currentData()) {
+    <div class="view-controls">
+      <button 
+        (click)="switchData('all')"
+        class="toggle-btn"
+        [class.active]="viewMode() === 'all'"
+      >
+        כל המשפחה
+      </button>
+      <button 
+        (click)="switchData('males')"
+        class="toggle-btn"
+        [class.active]="viewMode() === 'males'"
+      >
+        רק גברים
+      </button>
+    </div>
+  }
+
+  @if (currentData()) {
+    <app-family-tree [rootData]="currentData()!" [searchedTz]="searchedTz()"></app-family-tree>
+  } @else {
+    <div class="empty-state">
+      <div class="empty-state-content">
+        <h2>עץ המשפחה</h2>
+        <p>הזן תעודת זהות בתיבת החיפוש כדי להציג את עץ המשפחה.</p>
+      </div>
+    </div>
+  }
+</div>
