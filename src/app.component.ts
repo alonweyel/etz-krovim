@@ -24,6 +24,9 @@ export class AppComponent {
   searchControl = new FormControl('');
 
   onSearch() {
+    if(this.searchControl.value?.startsWith('0')){
+      this.searchControl.patchValue(this.searchControl.value.substring(1));
+    }
     const tz = this.searchControl.value?.trim();
     if (!tz) return;
 

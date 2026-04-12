@@ -2,7 +2,7 @@ export interface FamilyMember {
   id: number;
   tz?: string; // תעודת זהות
   name: string;
-  gender: 'male' | 'female';
+  gender: 'זכר' | 'נקבה';
   birthDate: Date;
   address: string;
   photo: string;
@@ -20,7 +20,7 @@ export const FAMILY_DATA: FamilyMember = {
   id: 1,
   tz: '300000001',
   name: 'אברהם כהן', // Great Grandparent
-  gender: 'male',
+  gender: 'זכר',
   birthDate: new Date('1930-05-15'),
   address: 'ירושלים, ישראל',
   photo: 'https://randomuser.me/api/portraits/men/1.jpg',
@@ -32,7 +32,7 @@ export const FAMILY_DATA: FamilyMember = {
       id: 101,
       tz: '300000002',
       name: 'שרה כהן',
-      gender: 'female',
+      gender: 'נקבה',
       birthDate: new Date('1932-04-10'),
       address: 'ירושלים, ישראל',
       photo: 'https://randomuser.me/api/portraits/women/1.jpg',
@@ -44,7 +44,7 @@ export const FAMILY_DATA: FamilyMember = {
       id: 102,
       tz: '300000003',
       name: 'הגר',
-      gender: 'female',
+      gender: 'נקבה',
       birthDate: new Date('1935-01-01'),
       address: 'מצרים',
       photo: 'https://randomuser.me/api/portraits/women/2.jpg',
@@ -56,7 +56,7 @@ export const FAMILY_DATA: FamilyMember = {
       id: 2,
       tz: '300000004',
       name: 'יצחק כהן', // Grandparent 1
-      gender: 'male',
+      gender: 'זכר',
       birthDate: new Date('1955-08-20'),
       address: 'תל אביב, ישראל',
       photo: 'https://randomuser.me/api/portraits/men/2.jpg',
@@ -69,7 +69,7 @@ export const FAMILY_DATA: FamilyMember = {
           id: 103,
           tz: '300000005',
           name: 'רבקה כהן',
-          gender: 'female',
+          gender: 'נקבה',
           birthDate: new Date('1958-09-01'),
           address: 'תל אביב, ישראל',
           photo: 'https://randomuser.me/api/portraits/women/3.jpg',
@@ -82,7 +82,7 @@ export const FAMILY_DATA: FamilyMember = {
           id: 3,
           tz: '300000006',
           name: 'יעקב כהן', // Parent 1
-          gender: 'male',
+          gender: 'זכר',
           birthDate: new Date('1980-02-10'),
           address: 'חיפה, ישראל',
           photo: 'https://randomuser.me/api/portraits/men/3.jpg',
@@ -95,7 +95,7 @@ export const FAMILY_DATA: FamilyMember = {
               id: 104,
               tz: '300000007',
               name: 'רחל כהן',
-              gender: 'female',
+              gender: 'נקבה',
               birthDate: new Date('1982-05-05'),
               address: 'חיפה, ישראל',
               photo: 'https://randomuser.me/api/portraits/women/4.jpg',
@@ -106,7 +106,7 @@ export const FAMILY_DATA: FamilyMember = {
               id: 105,
               tz: '300000008',
               name: 'לאה כהן',
-              gender: 'female',
+              gender: 'נקבה',
               birthDate: new Date('1983-06-06'),
               address: 'חיפה, ישראל',
               photo: 'https://randomuser.me/api/portraits/women/5.jpg',
@@ -120,7 +120,7 @@ export const FAMILY_DATA: FamilyMember = {
               id: 4,
               tz: '300000009',
               name: 'יוסף כהן', // Child 1
-              gender: 'male',
+              gender: 'זכר',
               birthDate: new Date('2005-11-30'),
               address: 'חיפה, ישראל',
               photo: 'https://randomuser.me/api/portraits/men/4.jpg',
@@ -133,7 +133,7 @@ export const FAMILY_DATA: FamilyMember = {
               id: 5,
               tz: '300000010',
               name: 'דינה כהן', // Child 2
-              gender: 'female',
+              gender: 'נקבה',
               birthDate: new Date('2008-06-15'),
               address: 'חיפה, ישראל',
               photo: 'https://randomuser.me/api/portraits/women/6.jpg',
@@ -145,7 +145,7 @@ export const FAMILY_DATA: FamilyMember = {
               id: 12,
               tz: '300000011',
               name: 'בנימין כהן', // Child 3 (Rachel)
-              gender: 'male',
+              gender: 'זכר',
               birthDate: new Date('2015-02-20'),
               address: 'חיפה, ישראל',
               photo: 'https://randomuser.me/api/portraits/men/5.jpg',
@@ -158,7 +158,7 @@ export const FAMILY_DATA: FamilyMember = {
               id: 13,
               tz: '300000012',
               name: 'ראובן כהן',
-              gender: 'male',
+              gender: 'זכר',
               birthDate: new Date('2006-01-15'),
               address: 'חיפה, ישראל',
               photo: 'https://randomuser.me/api/portraits/men/6.jpg',
@@ -171,7 +171,7 @@ export const FAMILY_DATA: FamilyMember = {
               id: 14,
               tz: '300000013',
               name: 'שמעון כהן',
-              gender: 'male',
+              gender: 'זכר',
               birthDate: new Date('2007-03-22'),
               address: 'חיפה, ישראל',
               photo: 'https://randomuser.me/api/portraits/men/7.jpg',
@@ -185,7 +185,7 @@ export const FAMILY_DATA: FamilyMember = {
           id: 6,
           tz: '300000014',
           name: 'עשו כהן', // Parent 2
-          gender: 'male',
+          gender: 'זכר',
           birthDate: new Date('1982-01-01'),
           address: 'אילת, ישראל',
           photo: 'https://randomuser.me/api/portraits/men/8.jpg',
@@ -197,7 +197,7 @@ export const FAMILY_DATA: FamilyMember = {
               id: 7,
               tz: '300000015',
               name: 'אליפז כהן',
-              gender: 'male',
+              gender: 'זכר',
               birthDate: new Date('2010-03-20'),
               address: 'אילת, ישראל',
               photo: 'https://randomuser.me/api/portraits/men/9.jpg',
@@ -213,7 +213,7 @@ export const FAMILY_DATA: FamilyMember = {
       id: 8,
       tz: '300000016',
       name: 'ישמעאל דניאל כהן', // Grandparent 2 - Son of Hagar
-      gender: 'male',
+      gender: 'זכר',
       birthDate: new Date('1958-12-05'),
       address: 'באר שבע, ישראל',
       photo: 'https://randomuser.me/api/portraits/men/10.jpg',
@@ -225,7 +225,7 @@ export const FAMILY_DATA: FamilyMember = {
           id: 9,
           tz: '300000017',
           name: 'נביות כהן',
-          gender: 'male',
+          gender: 'זכר',
           birthDate: new Date('1985-07-22'),
           address: 'באר שבע, ישראל',
           photo: 'https://randomuser.me/api/portraits/men/11.jpg',
@@ -235,7 +235,7 @@ export const FAMILY_DATA: FamilyMember = {
               id: 106,
               tz: '300000018',
               name: 'מחלת',
-              gender: 'female',
+              gender: 'נקבה',
               birthDate: new Date('1988-08-08'),
               address: 'באר שבע, ישראל',
               photo: 'https://randomuser.me/api/portraits/women/8.jpg',
@@ -247,7 +247,7 @@ export const FAMILY_DATA: FamilyMember = {
               id: 10,
               tz: '300000019',
               name: 'קידר כהן', // Child Gen 4
-              gender: 'male',
+              gender: 'זכר',
               birthDate: new Date('2012-09-09'),
               address: 'באר שבע, ישראל',
               photo: 'https://randomuser.me/api/portraits/men/12.jpg',
@@ -263,7 +263,7 @@ export const FAMILY_DATA: FamilyMember = {
       id: 11,
       tz: '300000020',
       name: 'מרים כהן', // Daughter for Gen 2 - Daughter of Sarah
-      gender: 'female',
+      gender: 'נקבה',
       birthDate: new Date('1960-03-15'),
       address: 'נתניה, ישראל',
       photo: 'https://randomuser.me/api/portraits/women/9.jpg',
@@ -274,7 +274,7 @@ export const FAMILY_DATA: FamilyMember = {
           id: 107,
           tz: '300000021',
           name: 'דוד לוי',
-          gender: 'male',
+          gender: 'זכר',
           birthDate: new Date('1959-11-20'),
           address: 'נתניה, ישראל',
           photo: 'https://randomuser.me/api/portraits/men/13.jpg',
@@ -288,12 +288,12 @@ export const FAMILY_DATA: FamilyMember = {
 
 // Helper function to create male-only tree
 function filterMalesOnly(node: FamilyMember): FamilyMember | null {
-  if (node.gender !== 'male') {
+  if (node.gender !== 'זכר') {
     return null;
   }
 
   // 1. Filter spouses (remove females)
-  const filteredSpouses = node.spouses ? node.spouses.filter(s => s.gender === 'male') : [];
+  const filteredSpouses = node.spouses ? node.spouses.filter(s => s.gender === 'זכר') : [];
 
   // 2. Filter children recursively
   const filteredChildren = node.children 

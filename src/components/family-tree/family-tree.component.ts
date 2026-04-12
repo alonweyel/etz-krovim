@@ -40,10 +40,10 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     
     // פונקציית עזר לחיפוש בעץ
     const findName = (node: FamilyMember): string | null => {
-      if (node.tz === tz) return node.name;
+      if (node.tz?.trim() === tz) return node.name;
       if (node.spouses) {
         for (const spouse of node.spouses) {
-          if (spouse.tz === tz) return spouse.name;
+          if (spouse.tz?.trim() === tz) return spouse.name;
         }
       }
       if (node.children) {
@@ -97,11 +97,11 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
         let searchedNode: HierarchyNode | undefined;
         
         const findNode = (node: HierarchyNode) => {
-          if (node.data.tz === tz) {
+          if (node.data.tz?.trim() === tz) {
             searchedNode = node;
             return;
           }
-          if (node.data.spouses && node.data.spouses.some(s => s.tz === tz)) {
+          if (node.data.spouses && node.data.spouses.some(s => s.tz?.trim() === tz)) {
             searchedNode = node;
             return;
           }
@@ -315,9 +315,9 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     const tz = this.searchedTz();
     if (tz) {
       const searchedNode = this.root.descendants().find((d: HierarchyNode) => {
-        if (d.data.tz === tz) return true;
+        if (d.data.tz?.trim() === tz) return true;
         if (d.data.spouses) {
-          return d.data.spouses.some(s => s.tz === tz);
+          return d.data.spouses.some(s => s.tz?.trim() === tz);
         }
         return false;
       });
@@ -468,8 +468,8 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                 .attr('rx', 8) // פינות עגולות
                 .attr('ry', 8)
                 .attr('class', () => {
-                    const genderClass = member.gender === 'male' ? 'male' : 'female';
-                    const highlightClass = member.tz === component.searchedTz() ? ' highlighted' : '';
+                    const genderClass = member.gender === 'זכר' ? 'male' : 'female';
+                    const highlightClass = member.tz?.trim() === component.searchedTz() ? ' highlighted' : '';
                     return `person-card ${genderClass}${highlightClass}`;
                 });
 
@@ -504,7 +504,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                 .attr('cy', imgCy)
                 .attr('r', imgRadius)
                 .attr('fill', 'none')
-                .attr('stroke', member.gender === 'male' ? '#90caf9' : '#f48fb1')
+                .attr('stroke', member.gender === 'זכר' ? '#90caf9' : '#f48fb1')
                 .attr('stroke-width', 2)
                 .style('pointer-events', 'none');
 
@@ -639,8 +639,8 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
              const member = cardGroup.datum() as FamilyMember;
              
              cardGroup.select('rect').attr('class', () => {
-                 const genderClass = member.gender === 'male' ? 'male' : 'female';
-                 const highlightClass = member.tz === component.searchedTz() ? ' highlighted' : '';
+                 const genderClass = member.gender === 'זכר' ? 'male' : 'female';
+                 const highlightClass = member.tz?.trim() === component.searchedTz() ? ' highlighted' : '';
                  return `person-card ${genderClass}${highlightClass}`;
              });
          });

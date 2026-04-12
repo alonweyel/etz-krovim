@@ -20,8 +20,8 @@
         <div class="header-content">
           <h2>{{ person.name }}</h2>
           <div class="subtitle-row">
-             <span class="chip" [class.male]="person.gender === 'male'" [class.female]="person.gender === 'female'">
-               {{ person.gender === 'male' ? 'זכר' : 'נקבה' }}
+             <span class="chip" [class.male]="person.gender === 'זכר'" [class.female]="person.gender === 'נקבה'">
+               {{ person.gender }}
              </span>
              <span class="birth-year">{{ person.birthDate | date:'yyyy' }}</span>
           </div>
