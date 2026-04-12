@@ -5,7 +5,7 @@ export interface FamilyMember {
   gender: 'זכר' | 'נקבה';
   birthDate: Date;
   address: string;
-  photo: string;
+  photo?: string;
   hobbies: string[];
   dna?: boolean; // Indicates if DNA data exists
   ta?: boolean; // Indicates if Fingerprint (Tvia Etzba) exists
@@ -59,7 +59,7 @@ export const FAMILY_DATA: FamilyMember = {
       gender: 'זכר',
       birthDate: new Date('1955-08-20'),
       address: 'תל אביב, ישראל',
-      photo: 'https://randomuser.me/api/portraits/men/2.jpg',
+      //photo: 'https://randomuser.me/api/portraits/men/2.jpg',
       hobbies: ['בישול', 'טיולים'],
       otherParentId: 101, // Child of Sarah
       dna: true,
@@ -238,7 +238,7 @@ export const FAMILY_DATA: FamilyMember = {
               gender: 'נקבה',
               birthDate: new Date('1988-08-08'),
               address: 'באר שבע, ישראל',
-              photo: 'https://randomuser.me/api/portraits/women/8.jpg',
+              // photo: 'https://randomuser.me/api/portraits/women/8.jpg',
               hobbies: ['רכיבה']
             }
           ],

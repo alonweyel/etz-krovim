@@ -74,8 +74,8 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
   private links: any[] = []; // רשימת החיבורים (קווים) בין הצמתים
 
   // הגדרות עיצוב לכרטיס
-  private rectW = 130;       // רוחב הכרטיס
-  private rectH = 80;        // גובה הכרטיס
+  private rectW = 80;       // רוחב הכרטיס
+  private rectH = 150;       // גובה הכרטיס
   private cardGap = 20;      // רווח בין כרטיסים סמוכים (למשל בין בני זוג)
 
   constructor() {
@@ -160,6 +160,12 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
   // סגירת חלונית הפרטים
   closeDetails() {
     this.selectedPerson.set(null);
+  }
+
+  getPhotoUrl(member: FamilyMember): string {
+      const defaultMalePhoto = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23e3f2fd"/><circle cx="50" cy="35" r="22" fill="%2390caf9"/><path d="M15 100 Q 50 60 85 100 Z" fill="%2390caf9"/></svg>';
+      const defaultFemalePhoto = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23fce4ec"/><circle cx="50" cy="35" r="22" fill="%23f48fb1"/><path d="M15 100 Q 50 60 85 100 Z" fill="%23f48fb1"/></svg>';
+      return member.photo ? member.photo : (member.gender === 'זכר' ? defaultMalePhoto : defaultFemalePhoto);
   }
 
   // חישוב גיל
@@ -275,7 +281,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
 
     // --- הגדרת פריסת העץ (Layout) ---
     this.treeLayout = d3.tree<FamilyMember>()
-      .nodeSize([160, 180]) // המרחק הבסיסי בין צמתים [רוחב, גובה]
+      .nodeSize([120, 200]) // המרחק הבסיסי בין צמתים [רוחב, גובה]
       .separation((a, b) => {
         // פונקציה שמחשבת את המרחק האופקי בין שני צמתים
         const aSpouses = a.data.spouses?.length || 0;
@@ -474,9 +480,9 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                 });
 
             // 2. תמונת הפרופיל
-            const imgRadius = 22;
-            const imgCx = component.rectW - 32;
-            const imgCy = 0; 
+            const imgRadius = 26;
+            const imgCx = component.rectW / 2;
+            const imgCy = -component.rectH / 2 + 15 + imgRadius; 
             const uniqueClipId = `clip-${member.id || Math.random().toString(36).substr(2,9)}`;
 
             // יצירת מסכה עגולה לתמונה (Clip Path)
@@ -488,8 +494,10 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                 .attr('cy', imgCy)
                 .attr('r', imgRadius);
 
+            const photoUrl = component.getPhotoUrl(member);
+
             cardGroup.append('image')
-                .attr('href', member.photo)
+                .attr('href', photoUrl)
                 .attr('x', imgCx - imgRadius)
                 .attr('y', imgCy - imgRadius)
                 .attr('width', imgRadius * 2)
@@ -509,11 +517,10 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                 .style('pointer-events', 'none');
 
             // 3. טקסט (שם ותאריך) באמצעות ForeignObject
-            // מאפשר שימוש ב-HTML רגיל בתוך SVG כדי לקבל גלישת טקסט (Word Wrap) ותמיכה בעברית (RTL)
-            const foWidth = component.rectW - 70; // Updated: Increased spacing
-            const foHeight = component.rectH - 10;
-            const foX = 5; 
-            const foY = -component.rectH / 2 + 5;
+            const foWidth = component.rectW - 4;
+            const foHeight = 50;
+            const foX = 2; 
+            const foY = imgCy + imgRadius + 5;
 
             const fo = cardGroup.append('foreignObject')
                 .attr('x', foX)
@@ -529,9 +536,9 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                 .style('height', '100%')
                 .style('display', 'flex')
                 .style('flex-direction', 'column')
-                .style('justify-content', 'center')
-                .style('align-items', 'flex-start')
-                .style('text-align', 'right')
+                .style('justify-content', 'flex-start')
+                .style('align-items', 'center')
+                .style('text-align', 'center')
                 .style('font-family', 'Roboto, sans-serif')
                 .style('line-height', '1.2')
                 .html(`
@@ -547,11 +554,11 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
             
             // תגית DNA
             if (member.dna) {
-               const dnaX = 20;
-               const dnaY = component.rectH / 2 - 12;
+               const dnaX = member.ta ? component.rectW / 2 - 14 : component.rectW / 2;
+               const dnaY = component.rectH / 2 - 18;
 
                cardGroup.append('rect')
-                 .attr('x', dnaX - 10)
+                 .attr('x', dnaX - 13)
                  .attr('y', dnaY - 8)
                  .attr('width', 26)
                  .attr('height', 14)
@@ -559,8 +566,8 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                  .attr('class', 'badge-rect dna');
 
                cardGroup.append('text')
-                 .attr('x', dnaX + 3)
-                 .attr('y', dnaY + 2)
+                 .attr('x', dnaX)
+                 .attr('y', dnaY + 3)
                  .attr('text-anchor', 'middle')
                  .text('DNA')
                  .attr('class', 'badge-text');
@@ -568,11 +575,11 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
 
             // תגית TA (טביעת אצבע)
             if (member.ta) {
-               const taX = member.dna ? 50 : 20;
-               const taY = component.rectH / 2 - 12;
+               const taX = member.dna ? component.rectW / 2 + 14 : component.rectW / 2;
+               const taY = component.rectH / 2 - 18;
 
                cardGroup.append('rect')
-                 .attr('x', taX - 10)
+                 .attr('x', taX - 13)
                  .attr('y', taY - 8)
                  .attr('width', 26)
                  .attr('height', 14)
@@ -580,8 +587,8 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                  .attr('class', 'badge-rect ta');
 
                cardGroup.append('text')
-                 .attr('x', taX + 3)
-                 .attr('y', taY + 2)
+                 .attr('x', taX)
+                 .attr('y', taY + 3)
                  .attr('text-anchor', 'middle')
                  .text('TA')
                  .attr('class', 'badge-text');

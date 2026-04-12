@@ -12,7 +12,7 @@
     @if (selectedPerson(); as person) {
       <!-- Header Image -->
       <div class="sidebar-header">
-        <img [src]="person.photo" class="cover-image" alt="Profile">
+        <img [src]="getPhotoUrl(person)" class="cover-image" alt="Profile">
         <div class="overlay-gradient"></div>
         <button (click)="closeDetails()" class="close-btn">
           <span class="material-icons">close</span>
