@@ -172,7 +172,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
   calculateAge(birthDate: Date | undefined): number | string {
     if (!birthDate) return '';
     const today = new Date();
-    const birthDateObj = birthDate;
+    const birthDateObj = new Date(birthDate);
     let age = today.getFullYear() - birthDateObj.getFullYear();
     const m = today.getMonth() - birthDateObj.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
