@@ -300,14 +300,89 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     // המרת המידע למבנה היררכי של D3
     this.root = d3.hierarchy<FamilyMember>(data, (d) => d.children) as HierarchyNode;
     
-    // אתחול משתנים לכל צומת
+    const tz = this.searchedTz();
+    let searchedNode: HierarchyNode | undefined;
+    
+    if (tz) {
+      searchedNode = this.root.descendants().find((d: HierarchyNode) => {
+        if (d.data.tz?.trim() === tz) return true;
+        if (d.data.spouses) {
+          return d.data.spouses.some(s => s.tz?.trim() === tz);
+        }
+        return false;
+      });
+    }
+
+    // יצירת סט של מזהי צמתים (ומזהי בני זוג) שצריכים להיות פתוחים
+    const expandedPaths = new Map<HierarchyNode, Set<string>>();
+    
+    if (searchedNode) {
+        // האדם שחיפשו - נפתח את כל בני הזוג שלו
+        const searchedSpouses = new Set<string>();
+        const totalMembers = [searchedNode.data, ...(searchedNode.data.spouses || [])];
+        totalMembers.forEach(m => searchedSpouses.add(m.id ? String(m.id) : 'main'));
+        expandedPaths.set(searchedNode, searchedSpouses);
+        
+        // הורים וסבים - נפתח רק את הנתיב שמוביל לאדם שחיפשו
+        let current = searchedNode;
+        while (current.parent) {
+            const parent = current.parent;
+            const childData = current.data as FamilyMember;
+            
+            // מזהה בן הזוג של ההורה שדרכו הגענו לילד
+            let parentTrackId = childData.otherParentId ? String(childData.otherParentId) : (parent.data.id ? String(parent.data.id) : 'main');
+            
+            if (!expandedPaths.has(parent)) {
+                expandedPaths.set(parent, new Set<string>());
+            }
+            expandedPaths.get(parent)!.add(parentTrackId);
+            
+            current = parent;
+        }
+    } else {
+        // אם לא חיפשו אף אחד, נפתח את השורש
+        const rootSpouses = new Set<string>();
+        const totalMembers = [this.root.data, ...(this.root.data.spouses || [])];
+        totalMembers.forEach(m => rootSpouses.add(m.id ? String(m.id) : 'main'));
+        expandedPaths.set(this.root, rootSpouses);
+    }
+
+    // אתחול משתנים לכל צומת וסגירת צמתים שלא בנתיב
     this.root.descendants().forEach((d: HierarchyNode) => {
-        if (d.children) {
-            d.allChildNodes = d.children as HierarchyNode[];
-            d.collapsedSpouseIds = new Set<string>();
-        } else {
-            d.allChildNodes = [];
-            d.collapsedSpouseIds = new Set<string>();
+        d.allChildNodes = d.children ? (d.children as HierarchyNode[]) : [];
+        d.collapsedSpouseIds = new Set<string>();
+        
+        const spousesToExpand = expandedPaths.get(d) || new Set<string>();
+        
+        const spouses = d.data.spouses || [];
+        const totalMembers = [d.data, ...spouses];
+        
+        totalMembers.forEach((member, index) => {
+             const hasChildren = d.allChildNodes!.some((childNode: any) => {
+                const childData = childNode.data as FamilyMember;
+                if (childData.otherParentId === member.id) return true;
+                if (!childData.otherParentId && index === 0) return true;
+                return false;
+            });
+            if (hasChildren) {
+                const trackId = member.id ? String(member.id) : 'main';
+                if (!spousesToExpand.has(trackId)) {
+                    d.collapsedSpouseIds!.add(trackId);
+                }
+            }
+        });
+        
+        // סינון הילדים שצריכים להיות מוצגים כרגע
+        if (d.allChildNodes.length > 0) {
+            const visibleChildren = d.allChildNodes.filter((childNode: any) => {
+                const childData = childNode.data as FamilyMember;
+                let parentId = childData.otherParentId ? String(childData.otherParentId) : '';
+                if (!parentId) {
+                    parentId = d.data.id ? String(d.data.id) : 'main'; 
+                }
+                return !d.collapsedSpouseIds!.has(parentId);
+            });
+            d.children = visibleChildren.length > 0 ? visibleChildren : undefined;
         }
     });
 
@@ -318,21 +393,10 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     this.update(this.root);
 
     // מירכוז על האדם שחיפשו
-    const tz = this.searchedTz();
-    if (tz) {
-      const searchedNode = this.root.descendants().find((d: HierarchyNode) => {
-        if (d.data.tz?.trim() === tz) return true;
-        if (d.data.spouses) {
-          return d.data.spouses.some(s => s.tz?.trim() === tz);
-        }
-        return false;
-      });
-
-      if (searchedNode) {
-        setTimeout(() => {
-          this.centerOnNode(searchedNode);
-        }, 100);
-      }
+    if (searchedNode) {
+      setTimeout(() => {
+        this.centerOnNode(searchedNode!);
+      }, 100);
     }
   }
 
