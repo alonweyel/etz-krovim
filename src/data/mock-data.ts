@@ -100,7 +100,49 @@ export const FAMILY_DATA: FamilyMember = {
               address: 'חיפה, ישראל',
               photo: 'https://randomuser.me/api/portraits/women/4.jpg',
               hobbies: ['ריצה'],
-              dna: true
+              otherParentId: 7702,
+              dna: true,
+              parents: [
+                {
+                  id: 201,
+                  name: 'אבא של רחל',
+                  gender: 'זכר',
+                  birthDate: new Date('1950-01-01'),
+                  address: 'תל אביב',
+                  hobbies: [],
+                  spouses:[
+                    {
+                      id: 7702,
+                      name: 'אמא של רחל',
+                      gender: 'נקבה',
+                      birthDate: new Date('1951-01-01'),
+                      address: 'תל אביב',
+                      hobbies: [],
+                    }
+                  ],
+                  children: [
+                    {
+                      id: 202,
+                      name: 'אח של רחל',
+                      gender: 'זכר',
+                      birthDate: new Date('1985-01-01'),
+                      address: 'תל אביב',
+                      hobbies: [],
+                      otherParentId: 7702,
+                      children: [
+                        {
+                          id: 203,
+                          name: 'אחיין של רחל',
+                          gender: 'זכר',
+                          birthDate: new Date('2010-01-01'),
+                          address: 'תל אביב',
+                          hobbies: []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
               id: 105,

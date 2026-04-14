@@ -33,6 +33,12 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
   // סיגנל שמחזיק את האדם שנבחר כרגע (להצגה בסרגל הצד)
   selectedPerson = signal<FamilyMember | null>(null);
 
+  // סט משפחות בני זוג מורחבות
+  expandedSpouseFamilies: Set<number> = new Set();
+  
+  // מטמון לשמירת ההיררכיה של העצים המשניים (כדי לשמור על מצב כיווץ/הרחבה)
+  private miniTreeHierarchies = new Map<number, any[]>();
+
   // חישוב שם האדם שחיפשו
   searchedPersonName = computed(() => {
     const tz = this.searchedTz();
@@ -220,6 +226,13 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
             spouse.children = node.children.filter(child => child.otherParentId === spouse.id);
         }
         currentParents.push(spouse);
+
+        // העשרת משפחת המקור של בן הזוג (אם קיימת)
+        if (spouse.parents && spouse.parents.length > 0) {
+            spouse.parents.forEach(parent => {
+                this.enrichData(parent);
+            });
+        }
       });
     }
 
@@ -427,10 +440,133 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
   // --- ליבת הציור (Core Update Loop) ---
   // זו הפונקציה המרכזית של D3 שמטפלת בציור האלמנטים, אנימציות כניסה/יציאה ועדכון מיקומים
   private update(source: any) {
-    // חישוב המיקומים החדשים של כל הצמתים והקווים
+    // חישוב המיקומים החדשים של כל הצמתים והקווים בעץ הראשי
     const treeData = this.treeLayout(this.root);
-    const nodes = treeData.descendants();
-    this.links = treeData.links();
+    let nodes = treeData.descendants();
+    let linksData = treeData.links();
+
+    const NODE_WIDTH = 220; // מרווח ביטחון אופקי
+    const NODE_HEIGHT = 120; // מרווח ביטחון אנכי
+
+    // הוספת משפחות של בני זוג (אם הורחבו)
+    nodes.forEach((node: any) => {
+        const spouses = node.data.spouses || [];
+        spouses.forEach((spouse: FamilyMember, index: number) => {
+            if (spouse.id && this.expandedSpouseFamilies.has(spouse.id) && spouse.parents && spouse.parents.length > 0) {
+                const spousesCount = spouses.length + 1;
+                const totalWidth = (spousesCount * this.rectW) + ((spousesCount - 1) * this.cardGap);
+                const startX = -(totalWidth / 2);
+                const spouseXOffset = startX + ((index + 1) * (this.rectW + this.cardGap)) + (this.rectW / 2);
+
+                const spouseAbsX = node.x + spouseXOffset;
+                const spouseAbsY = node.y;
+
+                const dummySpouseNode = {
+                    x: spouseAbsX,
+                    y: spouseAbsY,
+                    id: 'dummy-' + spouse.id,
+                    data: spouse,
+                    mainNode: node
+                };
+
+                let cachedHierarchies = this.miniTreeHierarchies.get(spouse.id!);
+                if (!cachedHierarchies) {
+                    cachedHierarchies = spouse.parents.map((parentData: FamilyMember) => {
+                        const parentHierarchy = d3.hierarchy<FamilyMember>(parentData, d => d.children) as HierarchyNode;
+                        // אתחול משתנים עבור כפתורי הרחבה/צמצום בעץ המשני
+                        parentHierarchy.descendants().forEach((d: any) => {
+                            d.allChildNodes = d.children ? (d.children as HierarchyNode[]) : [];
+                            if (!d.collapsedSpouseIds) {
+                                d.collapsedSpouseIds = new Set<string>();
+                            }
+                        });
+                        return parentHierarchy;
+                    });
+                    this.miniTreeHierarchies.set(spouse.id!, cachedHierarchies);
+                }
+
+                cachedHierarchies.forEach((parentHierarchy: HierarchyNode) => {
+                    const miniTree = d3.tree<FamilyMember>()
+                        .nodeSize([140, 200])
+                        .separation((a, b) => {
+                            const aSpouses = a.data.spouses?.length || 0;
+                            const bSpouses = b.data.spouses?.length || 0;
+                            const aWidth = 1 + (aSpouses * 0.9);
+                            const bWidth = 1 + (bSpouses * 0.9);
+                            const sep = (aWidth + bWidth) / 2 + 0.15;
+                            return a.parent === b.parent ? sep : sep + 0.2;
+                        })(parentHierarchy);
+
+                    const miniNodes = miniTree.descendants();
+
+                    // קביעת כיוון ההזזה (ימינה אם אנחנו בצד ימין של העץ, שמאלה אם בשמאל)
+                    const direction = node.x >= 0 ? 1 : -1;
+                    let dx = spouseAbsX - miniTree.x;
+                    const dy = spouseAbsY - 200;
+
+                    // מנגנון מניעת התנגשויות (Collision Resolution)
+                    let collision = true;
+                    let attempts = 0;
+                    while (collision && attempts < 50) {
+                        collision = false;
+                        for (const mNode of miniNodes) {
+                            const mX = mNode.x + dx;
+                            const mY = mNode.y + dy;
+
+                            // בדיקה מול כל הצמתים שכבר מוקמו (כולל העץ הראשי ועצים משניים קודמים)
+                            for (const eNode of nodes) {
+                                if (Math.abs(mY - eNode.y) < NODE_HEIGHT) {
+                                    if (Math.abs(mX - eNode.x) < NODE_WIDTH) {
+                                        collision = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (collision) break;
+                        }
+                        if (collision) {
+                            dx += direction * 60; // הזזה של 60 פיקסלים ובדיקה מחדש
+                            attempts++;
+                        }
+                    }
+
+                    // החלת המיקום הסופי
+                    miniNodes.forEach((d: any) => {
+                        d.x += dx;
+                        d.y += dy; 
+                        
+                        d.id = 'spouse-fam-' + spouse.id + '-' + (d.data.id || d.data.name);
+                        d.isSpouseFamily = true;
+                        
+                        if (d.x0 === undefined) {
+                            d.x0 = spouseAbsX;
+                            d.y0 = spouseAbsY;
+                        }
+                    });
+
+                    nodes = nodes.concat(miniNodes);
+
+                    const mLinks = miniTree.links();
+                    mLinks.forEach((l: any) => {
+                        linksData.push({
+                            source: l.source,
+                            target: l.target,
+                            isSpouseFamilyLink: true
+                        });
+                    });
+
+                    linksData.push({
+                        source: miniTree,
+                        target: dummySpouseNode,
+                        isSpouseFamilyLink: true,
+                        isSpouseToParentLink: true
+                    });
+                });
+            }
+        });
+    });
+
+    this.links = linksData;
 
     // ------------------- טיפול בצמתים (Nodes) -------------------
     
@@ -446,7 +582,6 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
       .attr('class', 'node')
       .attr('transform', (d: any) => `translate(${source.x0},${source.y0})`) // מתחילים מהמיקום של ההורה (לאפקט צמיחה)
       .call(d3.drag() 
-        .filter((event: any) => !event.target.closest('.toggle-btn')) // לא לאפשר גרירה מכפתור הפלוס/מינוס
         .on('start', function(event: any, d: any) {
            d3.select(this).raise(); 
            // שמירת מיקום התחלתי לזיהוי "קליק מרושל" (Sloppy Click)
@@ -475,6 +610,27 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
             if (!d.__isDrag) {
                 const targetElement = event.sourceEvent.target as Element;
                 
+                // התעלם מלחיצות על כפתורי הרחבה/צמצום וכפתורי משפחת מקור
+                const familyBtn = targetElement.closest('.family-btn');
+                if (familyBtn) {
+                    const memberId = Number(familyBtn.getAttribute('data-id'));
+                    component.toggleSpouseFamily(memberId);
+                    delete d.__isDrag;
+                    delete d.__initialX;
+                    delete d.__initialY;
+                    return;
+                }
+
+                const toggleBtn = targetElement.closest('.toggle-btn');
+                if (toggleBtn) {
+                    const trackId = toggleBtn.getAttribute('data-id')!;
+                    component.toggleSpouseChildren(d, trackId);
+                    delete d.__isDrag;
+                    delete d.__initialX;
+                    delete d.__initialY;
+                    return;
+                }
+
                 // מוצאים את הקבוצה הספציפית של הכרטיס שנלחץ (כולל בני זוג)
                 const cardGroup = targetElement.closest('.member-card-group');
                 
@@ -675,11 +831,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                     .attr('class', 'toggle-btn')
                     .attr('style', 'cursor: pointer')
                     .attr('data-id', trackId)
-                    .attr('transform', `translate(${component.rectW / 2}, ${component.rectH / 2})`)
-                    .on('click', (event: any) => {
-                        event.stopPropagation(); // מניעת הפעלת הלחיצה על הכרטיס
-                        component.toggleSpouseChildren(d, trackId);
-                    });
+                    .attr('transform', `translate(${component.rectW / 2}, ${component.rectH / 2})`);
                 
                 btnGroup.append('circle')
                   .attr('r', 8);
@@ -688,6 +840,28 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                   .attr('dy', 3)
                   .attr('text-anchor', 'middle')
                   .text(isCollapsed ? '+' : '-');
+            }
+
+            // 6. כפתור הצגת משפחת מקור (Spouse Family)
+            // מציגים רק עבור בני זוג (index > 0) ולא עבור האדם המרכזי בשושלת
+            if (index > 0 && member.parents && member.parents.length > 0) {
+                const isExpanded = component.expandedSpouseFamilies.has(member.id);
+                const familyBtnX = component.rectW / 2;
+                const familyBtnY = -component.rectH / 2; // Above the card
+
+                const familyBtnGroup = cardGroup.append('g')
+                    .attr('class', 'family-btn')
+                    .attr('style', 'cursor: pointer')
+                    .attr('data-id', member.id)
+                    .attr('transform', `translate(${familyBtnX}, ${familyBtnY})`);
+                
+                familyBtnGroup.append('circle')
+                  .attr('r', 8);
+
+                familyBtnGroup.append('text')
+                  .attr('dy', 3)
+                  .attr('text-anchor', 'middle')
+                  .text(isExpanded ? '-' : '+');
             }
         });
     });
@@ -723,6 +897,16 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
              if (spouseId) {
                 const isCollapsed = d.collapsedSpouseIds?.has(spouseId);
                 btn.select('text').text(isCollapsed ? '+' : '-');
+             }
+         });
+
+         // עדכון כפתורי משפחת מקור
+         group.selectAll('.family-btn').each(function(this: any) {
+             const btn = d3.select(this);
+             const memberId = Number(btn.attr('data-id'));
+             if (memberId) {
+                const isExpanded = component.expandedSpouseFamilies.has(memberId);
+                btn.select('text').text(isExpanded ? '-' : '+');
              }
          });
     });
@@ -772,7 +956,17 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
         d.children = visibleChildren.length > 0 ? visibleChildren : null;
     }
 
-    this.update(d); // ציור מחדש
+    this.update(this.root); // ציור מחדש מהשורש כדי לטפל גם בעצים משניים
+  }
+
+  // לוגיקה להצגה/הסתרה של משפחת המקור של בן/בת הזוג
+  private toggleSpouseFamily(spouseId: number) {
+    if (this.expandedSpouseFamilies.has(spouseId)) {
+      this.expandedSpouseFamilies.delete(spouseId);
+    } else {
+      this.expandedSpouseFamilies.add(spouseId);
+    }
+    this.update(this.root);
   }
 
   // פונקציה לציור הקווים המקשרים
@@ -801,20 +995,46 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     };
 
     // חישוב מסלול הקו (Curve)
-    const diagonal = (s: any, d: any) => {
-        const parentMemberId = d.data.otherParentId;
-        const sOffset = getMemberOffset(s.data, parentMemberId); // חישוב יציאה מההורה הנכון
-        const tOffset = getMemberOffset(d.data, d.data.id);      // חישוב כניסה לילד
+    const diagonal = (s: any, d: any, linkData: any) => {
+        let sOffset = 0;
+        let tOffset = 0;
 
-        const sX = s.x + sOffset;
-        const tX = d.x + tOffset;
+        let sX = s.x;
+        let sY = s.y;
+        let tX = d.x;
+        let tY = d.y;
+
+        if (linkData.isSpouseToParentLink && d.mainNode) {
+            // חישוב מחדש של מיקום בן הזוג במקרה שהצומת הראשי נגרר
+            const mainNode = d.mainNode;
+            const spouses = mainNode.data.spouses || [];
+            const index = spouses.findIndex((sp: any) => sp.id === d.data.id);
+            if (index !== -1) {
+                const spousesCount = spouses.length + 1;
+                const totalWidth = (spousesCount * this.rectW) + ((spousesCount - 1) * this.cardGap);
+                const startX = -(totalWidth / 2);
+                const spouseXOffset = startX + ((index + 1) * (this.rectW + this.cardGap)) + (this.rectW / 2);
+                tX = mainNode.x + spouseXOffset;
+                tY = mainNode.y;
+            }
+            // חישוב יציאה מההורה הנכון
+            const parentMemberId = d.data?.otherParentId;
+            sOffset = getMemberOffset(s.data, parentMemberId);
+            sX += sOffset;
+        } else {
+            const parentMemberId = d.data?.otherParentId;
+            sOffset = getMemberOffset(s.data, parentMemberId); // חישוב יציאה מההורה הנכון
+            tOffset = getMemberOffset(d.data, d.data?.id);      // חישוב כניסה לילד
+            sX += sOffset;
+            tX += tOffset;
+        }
 
         // יצירת מסלול Bezier Curve מותאם אישית
-        return `M ${sX} ${s.y + cardHalfH}
-                V ${s.y + cardHalfH + 15}
-                C ${sX} ${s.y + cardHalfH + verticalGap},
-                  ${tX} ${d.y - cardHalfH - verticalGap},
-                  ${tX} ${d.y - cardHalfH}`;
+        return `M ${sX} ${sY + cardHalfH}
+                V ${sY + cardHalfH + 15}
+                C ${sX} ${sY + cardHalfH + verticalGap},
+                  ${tX} ${tY - cardHalfH - verticalGap},
+                  ${tX} ${tY - cardHalfH}`;
     };
 
     // בחירת כל הקווים
@@ -835,9 +1055,9 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     if (source) {
        linkUpdate.transition()
         .duration(this.duration)
-        .attr('d', (d: any) => diagonal(d.source, d.target));
+        .attr('d', (d: any) => diagonal(d.source, d.target, d));
     } else {
-       linkUpdate.attr('d', (d: any) => diagonal(d.source, d.target));
+       linkUpdate.attr('d', (d: any) => diagonal(d.source, d.target, d));
     }
 
     // EXIT: הסרת קווים
