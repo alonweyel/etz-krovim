@@ -39,7 +39,14 @@
         class="toggle-btn"
         [class.active]="viewMode() === 'males'"
       >
-        רק גברים
+        שושלת זכרית
+      </button>
+      <button 
+        (click)="switchData('females')"
+        class="toggle-btn"
+        [class.active]="viewMode() === 'females'"
+      >
+        שושלת נקבית
       </button>
     </div>
   }
