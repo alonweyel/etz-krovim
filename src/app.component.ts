@@ -84,7 +84,7 @@ function getMalesOnlyTree(root: FamilyMember, searchedTz: string): FamilyMember 
 
   if (rootIndex > 0) {
     const parent = path[rootIndex - 1];
-    if (parent.spouses?.some(s => s.tz === searchedTz)) {
+    if (parent.spouses?.some(s => s.tz?.trim() === searchedTz)) {
       isSpouse = true;
       mainNodeForSpouse = parent;
     }
@@ -98,7 +98,7 @@ function getMalesOnlyTree(root: FamilyMember, searchedTz: string): FamilyMember 
         let spouseChildren: FamilyMember[] = [];
         // If the spouse is male, get his children from the main tree
         if (searchedPerson.gender === 'זכר') {
-           const spouseIndex = mainNodeForSpouse.spouses!.findIndex(s => s.tz === searchedTz);
+           const spouseIndex = mainNodeForSpouse.spouses!.findIndex(s => s.tz?.trim() === searchedTz);
            spouseChildren = mainNodeForSpouse.children?.filter(c => {
                if (c.otherParentId) {
                    return c.otherParentId === searchedPerson.id;
@@ -140,7 +140,7 @@ function getMalesOnlyTree(root: FamilyMember, searchedTz: string): FamilyMember 
       };
     }
     // The searched person is a spouse. They are the root of their own male lineage.
-    const spouseIndex = mainNodeForSpouse.spouses!.findIndex(s => s.tz === searchedTz);
+    const spouseIndex = mainNodeForSpouse.spouses!.findIndex(s => s.tz?.trim() === searchedTz);
     const spouseChildren = mainNodeForSpouse.children?.filter(c => {
         if (c.otherParentId) {
             return c.otherParentId === searchedPerson.id;
@@ -223,12 +223,12 @@ function getMalesOnlyTree(root: FamilyMember, searchedTz: string): FamilyMember 
 
 function findPathToTz(node: FamilyMember, tz: string, currentPath: FamilyMember[] = []): FamilyMember[] | null {
   const path = [...currentPath, node];
-  if (node.tz === tz) {
+  if (node.tz?.trim() === tz) {
     return path;
   }
   if (node.spouses) {
     for (const spouse of node.spouses) {
-      if (spouse.tz === tz) {
+      if (spouse.tz?.trim() === tz) {
         return [...path, spouse];
       }
     }
@@ -243,7 +243,7 @@ function findPathToTz(node: FamilyMember, tz: string, currentPath: FamilyMember[
 }
 
 function buildMaleTree(node: FamilyMember, searchedTz: string): FamilyMember | null {
-  const isSearched = node.tz === searchedTz;
+  const isSearched = node.tz?.trim() === searchedTz;
   
   if (node.gender !== 'זכר' && !isSearched) {
     return null;
@@ -259,7 +259,7 @@ function buildMaleTree(node: FamilyMember, searchedTz: string): FamilyMember | n
   }
 
   const filteredSpouses = node.spouses 
-    ? node.spouses.filter(s => s.gender === 'זכר' || s.tz === searchedTz) 
+    ? node.spouses.filter(s => s.gender === 'זכר' || s.tz?.trim() === searchedTz) 
     : [];
 
   const filteredChildren = node.children 
@@ -299,7 +299,7 @@ function getFemalesOnlyTree(root: FamilyMember, searchedTz: string): FamilyMembe
 
   if (rootIndex > 0) {
     const parent = path[rootIndex - 1];
-    if (parent.spouses?.some(s => s.tz === searchedTz)) {
+    if (parent.spouses?.some(s => s.tz?.trim() === searchedTz)) {
       isSpouse = true;
       mainNodeForSpouse = parent;
     }
@@ -326,7 +326,7 @@ function getFemalesOnlyTree(root: FamilyMember, searchedTz: string): FamilyMembe
       if (femaleParent) {
         let spouseChildren: FamilyMember[] = [];
         if (searchedPerson.gender === 'נקבה') {
-           const spouseIndex = mainNodeForSpouse.spouses!.findIndex(s => s.tz === searchedTz);
+           const spouseIndex = mainNodeForSpouse.spouses!.findIndex(s => s.tz?.trim() === searchedTz);
            spouseChildren = mainNodeForSpouse.children?.filter(c => {
                if (c.otherParentId) {
                    return c.otherParentId === searchedPerson.id;
@@ -363,7 +363,7 @@ function getFemalesOnlyTree(root: FamilyMember, searchedTz: string): FamilyMembe
       };
     }
     
-    const spouseIndex = mainNodeForSpouse.spouses!.findIndex(s => s.tz === searchedTz);
+    const spouseIndex = mainNodeForSpouse.spouses!.findIndex(s => s.tz?.trim() === searchedTz);
     const spouseChildren = mainNodeForSpouse.children?.filter(c => {
         if (c.otherParentId) {
             return c.otherParentId === searchedPerson.id;
@@ -462,7 +462,7 @@ function getFemalesOnlyTree(root: FamilyMember, searchedTz: string): FamilyMembe
 }
 
 function buildFemaleTree(node: FamilyMember, searchedTz: string): FamilyMember | null {
-  const isSearched = node.tz === searchedTz;
+  const isSearched = node.tz?.trim() === searchedTz;
   
   // זכרים קוטעים את השושלת הנקבית - הם מוצגים אבל ללא בני זוג וללא ילדים
   if (node.gender === 'זכר') {
@@ -474,7 +474,7 @@ function buildFemaleTree(node: FamilyMember, searchedTz: string): FamilyMember |
   }
   
   const filteredSpouses = node.spouses 
-    ? node.spouses.filter(s => s.gender === 'נקבה' || s.tz === searchedTz) 
+    ? node.spouses.filter(s => s.gender === 'נקבה' || s.tz?.trim() === searchedTz) 
     : [];
 
   let filteredChildren: FamilyMember[] = [];
