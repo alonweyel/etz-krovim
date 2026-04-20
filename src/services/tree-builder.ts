@@ -109,7 +109,8 @@ export function buildTreeFromFlat(members: FamilyMemberDTO[], searchedTz: string
 
     // Hydrate spouses
     if (member.spouses && member.spouses.length > 0) {
-      member.spouses.forEach(spouseId => {
+      member.spouses.forEach((spousePtr: any) => {
+        const spouseId = typeof spousePtr === 'object' && spousePtr !== null ? spousePtr.id : spousePtr;
         if (!visitedIds.has(spouseId) && memberMap.has(spouseId)) {
           const spouseMember = memberMap.get(spouseId)!;
           const spouseNode = hydrate(spouseMember, new Set(visitedIds));

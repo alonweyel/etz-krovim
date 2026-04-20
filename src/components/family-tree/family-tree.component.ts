@@ -243,15 +243,14 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     // רקורסיה: מעבר על כל הילדים והפעלת הפונקציה גם עליהם
     if (node.children && node.children.length > 0) {
       node.children.forEach(child => {
-        let childSpecificParents = currentParents;
-        // מציאת ההורים הספציפיים של הילד (ההורה הראשי + בן הזוג הרלוונטי)
-        if (child.otherParentId) {
+        let childSpecificParents = currentParents.filter(p => p.id === child.parent1 || p.id === child.parent2);
+        
+        if (childSpecificParents.length === 0) {
             const mainParent = node;
-            const spouseParent = currentParents.find(p => p.id === child.otherParentId);
-            if (spouseParent) {
-                childSpecificParents = [mainParent, spouseParent];
-            }
+            const spouseParent = child.otherParentId ? currentParents.find(p => p.id === child.otherParentId) : null;
+            childSpecificParents = (spouseParent && spouseParent.id !== mainParent.id) ? [mainParent, spouseParent] : [mainParent];
         }
+
         this.enrichData(child, childSpecificParents, visited);
       });
     }
