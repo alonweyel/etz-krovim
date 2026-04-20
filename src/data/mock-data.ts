@@ -1,4 +1,4 @@
-export interface FamilyMember {
+export interface FamilyMemberDTO {
   id: number;
   tz?: string; // תעודת זהות
   name: string;
@@ -9,217 +9,228 @@ export interface FamilyMember {
   hobbies?: string[];
   dna?: boolean; // Indicates if DNA data exists
   ta?: boolean; // Indicates if Fingerprint (Tvia Etzba) exists
-  spouses?: FamilyMember[]; // Spouses are now full FamilyMember objects
+  spouses?: number[];//FamilyMember[]; // Spouses are now full FamilyMember objects
+  children?: number[];//FamilyMember[];
+  parent1?: number;
+  parent2?: number;
+}
+
+export interface FamilyMember extends Omit<FamilyMemberDTO, 'children' | 'spouses'> {
+  spouses?: FamilyMember[];
   children?: FamilyMember[];
-  parents?: FamilyMember[]; // Back reference to parents
-  _children?: FamilyMember[]; // For D3 collapsing state
-  otherParentId?: number; // ID of the specific second parent (e.g. mother) for visual linking
+  parents?: FamilyMember[];
+  _children?: FamilyMember[];
+  otherParentId?: number;
 }
 
 
-export const FAMILY_DATA: FamilyMember =
-{
-  "id": 3928788,
-  "tz": "12015111",
-  "name": "יוסף מוריץ וייל",
-  "gender": "זכר",
-  "birthDate": new Date('1948-06-16'),
-  "address": "הנביאים 13, רמת גן, 5225513",
-  "spouses": [
-    {
-      "id": 9061375,
-      "tz": "47707617",
-      "name": "פלורה וייל",
-      "gender": "נקבה",
-      "birthDate": new Date('1950-12-25'),
-      "address": "הנביאים 13, רמת גן, 5225513"
-    }
-  ],
-  "children": [
-    {
-      "id": 15825351,
-      "tz": "27121029",
-      "name": "וייל",
-      "gender": "זכר",
-      "birthDate": new Date("1974-02-01"),
-      "address": "גרשום 15, רמת גן, 5228643",
-      "otherParentId": 9061375
-    },
-    {
-      "id": 5008702,
-      "tz": "27394139",
-      "name": "סגלית קלרה ראובן וייל",
-      "gender": "נקבה",
-      "birthDate": new Date("1975-02-12"),
-      "address": "משה סנה 14, דירה 5, פתח תקווה, 4922353",
-      "otherParentId": 9061375,
-      "spouses": [
-        {
-          "id": 830009,
-          "tz": "38648200",
-          "name": "נאור ראובן",
-          "gender": "זכר",
-          "birthDate": new Date("1976-02-27"),
-          "address": "משה סנה 14, דירה 5, פתח תקווה, 4922353"
-        }
-      ],
-      "children": [
-        {
-          "id": 12987572,
-          "tz": "215889999",
-          "name": "עידן ראובן וייל",
-          "gender": "זכר",
-          "birthDate": new Date("2006-05-19"),
-          "address": "משה סנה 14, דירה 5, פתח תקווה, 4922353",
-          "otherParentId": 830009
-        },
-        {
-          "id": 13944190,
-          "tz": "218210003",
-          "name": "עמית ראובן וייל",
-          "gender": "זכר",
-          "birthDate": new Date("2009-05-08"),
-          "address": "משה סנה 14, דירה 5, פתח תקווה, 4922353",
-          "otherParentId": 830009
-        }
-      ]
-    },
-    {
-      "id": 2528413,
-      "tz": "34118265",
-      "name": "ערן וייל",
-      "gender": "זכר",
-      "birthDate": new Date("1977-06-03"),
-      "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
-      "otherParentId": 9061375,
-      "spouses": [
-        {
-          "id": 12973026,
-          "tz": "328745377",
-          "name": "מריאלה תמר ברנשטיין וייל",
-          "gender": "נקבה",
-          "birthDate": new Date("1975-12-17"),
-          "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121"
-        }
-      ],
-      "children": [
-        {
-          "id": 13226922,
-          "tz": "216797274",
-          "name": "דוד אלעאי וייל",
-          "gender": "זכר",
-          "birthDate": new Date("2007-03-20"),
-          "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
-          "otherParentId": 12973026
-        },
-        {
-          "id": 13583789,
-          "tz": "217645910",
-          "name": "הדס גיטל וייל",
-          "gender": "נקבה",
-          "birthDate": new Date("2008-04-20"),
-          "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
-          "otherParentId": 12973026
-        },
-        {
-          "id": 14214699,
-          "tz": "334625415",
-          "name": "מיכל שמחה וייל",
-          "gender": "נקבה",
-          "birthDate": new Date("2010-02-18"),
-          "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
-          "otherParentId": 12973026
-        },
-        {
-          "id": 14778197,
-          "tz": "335460994",
-          "name": "יוסף חיים וייל",
-          "gender": "זכר",
-          "birthDate": new Date("2011-09-18"),
-          "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
-          "otherParentId": 12973026
-        },
-        {
-          "id": 16210048,
-          "tz": "222645327",
-          "name": "יעקב מאיר וייל",
-          "gender": "זכר",
-          "birthDate": new Date("2013-10-23"),
-          "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
-          "otherParentId": 12973026
-        },
-        {
-          "id": 17215614,
-          "tz": "340695683",
-          "name": "אביגיל וייל",
-          "gender": "נקבה",
-          "birthDate": new Date("2015-08-07"),
-          "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
-          "otherParentId": 12973026
-        },
-        {
-          "id": 18028579,
-          "tz": "343670048",
-          "name": "נעמה פרימה וייל",
-          "gender": "נקבה",
-          "birthDate": new Date("2017-10-06"),
-          "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
-          "otherParentId": 12973026
-        }
-      ]
-    },
-    {
-      "id": 2068315,
-      "tz": "38155073",
-      "name": "אלון וייל",
-      "gender": "זכר",
-      "birthDate": new Date("1986-01-25"),
-      "address": "הנביאים 13, דירה 16, רמת גן, 5225513",
-      "otherParentId": 9061375,
-      "spouses": [
-        {
-          "id": 6744884,
-          "tz": "32533937",
-          "name": "לי-טל וייל",
-          "gender": "נקבה",
-          "birthDate": new Date("1986-08-10"),
-          "address": "הנביאים 13, דירה 16, רמת גן, 5225513"
-        }
-      ],
-      "children": [
-        {
-          "id": 15260362,
-          "tz": "337157770",
-          "name": "יעל וייל",
-          "gender": "נקבה",
-          "birthDate": new Date("2013-03-11"),
-          "address": "הנביאים 13, דירה 16, רמת גן, 5225513",
-          "otherParentId": 6744884
-        },
-        {
-          "id": 16477946,
-          "tz": "222772444",
-          "name": "נועה וייל",
-          "gender": "נקבה",
-          "birthDate": new Date("2014-09-06"),
-          "address": "הנביאים 13, דירה 16, רמת גן, 5225513",
-          "otherParentId": 6744884
-        },
-        {
-          "id": 20649572,
-          "tz": "233840008",
-          "name": "איתן וייל",
-          "gender": "זכר",
-          "birthDate": new Date("2020-08-17"),
-          "address": "הנביאים 13, דירה 16, רמת גן, 5225513",
-          "otherParentId": 6744884
-        }
-      ]
-    }
-  ]
-}
+export const FAMILY_DATA: FamilyMemberDTO[] = [
+  {
+    "id": 3928788,
+    "tz": "12015111",
+    "name": "יוסף מוריץ וייל",
+    "gender": "זכר",
+    "birthDate": new Date('1948-06-16'),
+    "address": "הנביאים 13, רמת גן, 5225513",
+    "spouses": [9061375],
+    "children": [15825351, 5008702, 2528413, 2068315],
 
+  },
 
+  {
+    "id": 9061375,
+    "tz": "47707617",
+    "name": "פלורה וייל",
+    "gender": "נקבה",
+    "birthDate": new Date('1950-12-25'),
+    "address": "הנביאים 13, רמת גן, 5225513",
+    "spouses": [3928788],
+    "children": [15825351, 5008702, 2528413, 2068315],
+  },
+
+  {
+    "id": 15825351,
+    "tz": "27121029",
+    "name": "וייל",
+    "gender": "זכר",
+    "birthDate": new Date("1974-02-01"),
+    "address": "גרשום 15, רמת גן, 5228643",
+    "parent1": 3928788,
+    "parent2": 9061375,
+  },
+  {
+    "id": 5008702,
+    "tz": "27394139",
+    "name": "סגלית קלרה ראובן וייל",
+    "gender": "נקבה",
+    "birthDate": new Date("1975-02-12"),
+    "address": "משה סנה 14, דירה 5, פתח תקווה, 4922353",
+    "spouses": [830009],
+    "children": [12987572, 13944190],
+    "parent1": 3928788,
+    "parent2": 9061375,
+  },
+
+  {
+    "id": 830009,
+    "tz": "38648200",
+    "name": "נאור ראובן",
+    "gender": "זכר",
+    "birthDate": new Date("1976-02-27"),
+    "address": "משה סנה 14, דירה 5, פתח תקווה, 4922353",
+    "spouses": [5008702],
+    "children": [12987572, 13944190],
+
+  },
+  {
+    "id": 12987572,
+    "tz": "215889999",
+    "name": "עידן ראובן וייל",
+    "gender": "זכר",
+    "birthDate": new Date("2006-05-19"),
+    "address": "משה סנה 14, דירה 5, פתח תקווה, 4922353",
+    "parent1": 5008702,
+    "parent2": 830009,
+  },
+  {
+    "id": 13944190,
+    "tz": "218210003",
+    "name": "עמית ראובן וייל",
+    "gender": "זכר",
+    "birthDate": new Date("2009-05-08"),
+    "address": "משה סנה 14, דירה 5, פתח תקווה, 4922353",
+    "parent1": 5008702,
+    "parent2": 830009,
+  },
+  {
+    "id": 2528413,
+    "tz": "34118265",
+    "name": "ערן וייל",
+    "gender": "זכר",
+    "birthDate": new Date("1977-06-03"),
+    "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
+    "spouses": [12973026],
+    "children": [13226922, 13583789],
+    "parent1": 3928788,
+    "parent2": 9061375,
+  },
+  {
+    "id": 12973026,
+    "tz": "328745377",
+    "name": "מריאלה תמר ברנשטיין וייל",
+    "gender": "נקבה",
+    "birthDate": new Date("1975-12-17"),
+    "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
+    "spouses": [2528413],
+    "children": [13226922, 13583789],
+  },
+  {
+    "id": 13226922,
+    "tz": "216797274",
+    "name": "דוד אלעאי וייל",
+    "gender": "זכר",
+    "birthDate": new Date("2007-03-20"),
+    "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
+    "parent1": 2528413,
+    "parent2": 12973026,
+  },
+  {
+    "id": 13583789,
+    "tz": "217645910",
+    "name": "הדס גיטל וייל",
+    "gender": "נקבה",
+    "birthDate": new Date("2008-04-20"),
+    "address": "מלאכי הנביא 10, דירה 27, בית שמש, 9914121",
+    "parent1": 2528413,
+    "parent2": 12973026,
+  },
+  {
+    "id": 2068315,
+    "tz": "38155073",
+    "name": "אלון וייל",
+    "gender": "זכר",
+    "birthDate": new Date("1986-01-25"),
+    "address": "הנביאים 13, דירה 16, רמת גן, 5225513",
+    "spouses": [6744884],
+    "children": [15260362, 16477946, 20649572],
+    "parent1": 3928788,
+    "parent2": 9061375,
+  },
+  {
+    "id": 6744884,
+    "tz": "32533937",
+    "name": "לי-טל וייל",
+    "gender": "נקבה",
+    "birthDate": new Date("1986-08-10"),
+    "address": "הנביאים 13, דירה 16, רמת גן, 5225513",
+    "spouses": [2068315],
+    "children": [15260362, 16477946, 20649572],
+    "parent1": 1111,
+    "parent2": 2222,
+  },
+  {
+    "id": 15260362,
+    "tz": "337157770",
+    "name": "יעל וייל",
+    "gender": "נקבה",
+    "birthDate": new Date("2013-03-11"),
+    "address": "הנביאים 13, דירה 16, רמת גן, 5225513",
+    "parent1": 2068315,
+    "parent2": 6744884,
+  },
+  {
+    "id": 16477946,
+    "tz": "222772444",
+    "name": "נועה וייל",
+    "gender": "נקבה",
+    "birthDate": new Date("2014-09-06"),
+    "address": "הנביאים 13, דירה 16, רמת גן, 5225513",
+    "parent1": 2068315,
+    "parent2": 6744884,
+  },
+  {
+    "id": 20649572,
+    "tz": "233840008",
+    "name": "איתן וייל",
+    "gender": "זכר",
+    "birthDate": new Date("2020-08-17"),
+    "address": "הנביאים 13, דירה 16, רמת גן, 5225513",
+    "parent1": 2068315,
+    "parent2": 6744884,
+  },
+  {
+    "id": 1111,
+    "tz": "1111",
+    "name": "יעקב מובשוביץ",
+    "gender": "זכר",
+    "birthDate": new Date("1950-08-10"),
+    "address": "הנ, רמת גן, 5225513",
+    "spouses": [2222],
+    "children": [6744884, 3333],
+  },
+  {
+    "id": 2222,
+    "tz": "2222",
+    "name": "רינה מובשבוביץ",
+    "gender": "נקבה",
+    "birthDate": new Date("1950-08-10"),
+    "address": "הנ, רמת גן, 5225513",
+    "spouses": [1111],
+    "children": [6744884, 3333],
+  },
+  {
+    "id": 3333,
+    "tz": "3333",
+    "name": "מעין",
+    "gender": "נקבה",
+    "birthDate": new Date("1986-08-10"),
+    "address": "הנביאים 13, דירה 16, רמת גן, 5225513",
+    "spouses": [],
+    "children": [],
+    "parent1": 1111,
+    "parent2": 2222, 
+  }, 
+]
 
 
 // export const FAMILY_DATA: FamilyMember = {

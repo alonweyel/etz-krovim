@@ -198,7 +198,10 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
 
   // פונקציה זו עוברת על כל העץ ומוסיפה קישורים בין הורים לילדים,
   // ומסדרת את הילדים כך שיופיעו מתחת להורה הנכון (במקרה של ריבוי בני זוג)
-  private enrichData(node: FamilyMember, parents: FamilyMember[] = []) {
+  private enrichData(node: FamilyMember, parents: FamilyMember[] = [], visited = new Set<number>()) {
+    if (visited.has(node.id)) return;
+    visited.add(node.id);
+
     // קישור הורים לאובייקט הילד
     if (parents.length > 0) node.parents = parents;
 
@@ -220,6 +223,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     // טיפול בבני זוג
     if (node.spouses && node.spouses.length > 0) {
       node.spouses.forEach(spouse => {
+        visited.add(spouse.id); // למנוע לולאה אינסופית מדורות קודמים או קשרים צולבים
         spouse.spouses = [node]; // קישור דו-כיווני
         // שיוך ילדים ספציפיים לבן הזוג הזה (לצורך תצוגה בלבד)
         if (node.children) {
@@ -230,7 +234,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
         // העשרת משפחת המקור של בן הזוג (אם קיימת)
         if (spouse.parents && spouse.parents.length > 0) {
             spouse.parents.forEach(parent => {
-                this.enrichData(parent);
+                this.enrichData(parent, [], visited);
             });
         }
       });
@@ -248,7 +252,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                 childSpecificParents = [mainParent, spouseParent];
             }
         }
-        this.enrichData(child, childSpecificParents);
+        this.enrichData(child, childSpecificParents, visited);
       });
     }
   }
@@ -395,6 +399,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                 }
                 return !d.collapsedSpouseIds!.has(parentId);
             });
+            console.log("visibleChildren count for", d.data.id, " =", visibleChildren.length);
             d.children = visibleChildren.length > 0 ? visibleChildren : undefined;
         }
     });
@@ -471,8 +476,23 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
 
                 let cachedHierarchies = this.miniTreeHierarchies.get(spouse.id!);
                 if (!cachedHierarchies) {
-                    cachedHierarchies = spouse.parents.map((parentData: FamilyMember) => {
-                        const parentHierarchy = d3.hierarchy<FamilyMember>(parentData, d => d.children) as HierarchyNode;
+                    const uniqueParents: FamilyMember[] = [];
+                    const renderedIds = new Set<number>();
+                    spouse.parents.forEach((p: FamilyMember) => {
+                        if (!renderedIds.has(p.id)) {
+                             uniqueParents.push(p);
+                             renderedIds.add(p.id);
+                             if (p.spouses) {
+                                 p.spouses.forEach(s => renderedIds.add(s.id));
+                             }
+                        }
+                    });
+
+                    cachedHierarchies = uniqueParents.map((parentData: FamilyMember) => {
+                        const parentHierarchy = d3.hierarchy<FamilyMember>(parentData, d => {
+                             if (!d.children) return null;
+                             return d.children.filter(c => c.id !== spouse.id);
+                        }) as HierarchyNode;
                         // אתחול משתנים עבור כפתורי הרחבה/צמצום בעץ המשני
                         parentHierarchy.descendants().forEach((d: any) => {
                             d.allChildNodes = d.children ? (d.children as HierarchyNode[]) : [];

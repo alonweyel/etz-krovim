@@ -2,8 +2,9 @@ import { Component, signal, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { FamilyTreeComponent } from './components/family-tree/family-tree.component';
-import { FamilyMember } from './data/mock-data';
+import { FamilyMember, FamilyMemberDTO } from './data/mock-data';
 import { FamilyService } from './services/family.service';
+import { buildTreeFromFlat } from './services/tree-builder';
 
 @Component({
   selector: 'app-root',
@@ -37,11 +38,18 @@ export class AppComponent {
     // פנייה לשרת החיצוני (כרגע מוקינג)
     this.familyService.getFamilyTreeByTz(tz).subscribe({
       next: (data) => {
-        this.currentData.set(data);
-        this.FAMILY_DATA.set(data);
-        if(data != null){
-          this.MALE_ONLY_DATA.set(getMalesOnlyTree(data, tz));
-          this.FEMALE_ONLY_DATA.set(getFemalesOnlyTree(data, tz));
+        let treeData: FamilyMember | null = null;
+        if (data && Array.isArray(data)) {
+           treeData = buildTreeFromFlat(data, tz);
+        } else if (data) {
+           treeData = buildTreeFromFlat([data as unknown as FamilyMemberDTO], tz);
+        }
+
+        this.currentData.set(treeData);
+        this.FAMILY_DATA.set(treeData);
+        if(treeData != null){
+          this.MALE_ONLY_DATA.set(getMalesOnlyTree(treeData, tz));
+          this.FEMALE_ONLY_DATA.set(getFemalesOnlyTree(treeData, tz));
         }
         this.searchedTz.set(tz);
         this.viewMode.set('all');
