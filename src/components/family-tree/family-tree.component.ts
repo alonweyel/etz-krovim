@@ -83,6 +83,10 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
   private rectW = 80;       // רוחב הכרטיס
   private rectH = 150;       // גובה הכרטיס
   private cardGap = 20;      // רווח בין כרטיסים סמוכים (למשל בין בני זוג)
+  
+  // הוספת מרווח להתנגשויות ב-Mini Trees
+  private NODE_WIDTH = 100;
+  private NODE_HEIGHT = 200;
 
   constructor() {
     // אפקט שמגיב לשינויים במידע הנכנס (rootData) ומצייר מחדש את העץ
@@ -297,20 +301,20 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
 
     // --- הגדרת פריסת העץ (Layout) ---
     this.treeLayout = d3.tree<FamilyMember>()
-      .nodeSize([120, 200]) // המרחק הבסיסי בין צמתים [רוחב, גובה]
+      .nodeSize([105, 250]) // הוקטן עוד ל-105 כדי למשוך את האחים קרוב ככל הניתן
       .separation((a, b) => {
         // פונקציה שמחשבת את המרחק האופקי בין שני צמתים
         const aSpouses = a.data.spouses?.length || 0;
         const bSpouses = b.data.spouses?.length || 0;
         
-        // חישוב רוחב בהתאם לכמות בני הזוג (כדי שהם לא יעלו אחד על השני)
+        // ענפים עם מספר לא מאוזן של כרטיסים
         const aWidth = 1 + (aSpouses * 0.9);
         const bWidth = 1 + (bSpouses * 0.9);
         
-        const sep = (aWidth + bWidth) / 2 + 0.15;
+        const sep = (aWidth + bWidth) / 2;
         
-        // הוספת רווח נוסף אם מדובר בבני דודים (הורים שונים)
-        return a.parent === b.parent ? sep : sep + 0.2;
+        // אחים מקבלים מרחק מינימלי, בני דודים מקבלים תוספת ריווח 
+        return a.parent === b.parent ? sep : sep + 0.5;
       });
 
     // המרת המידע למבנה היררכי של D3
@@ -498,6 +502,29 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                             if (!d.collapsedSpouseIds) {
                                 d.collapsedSpouseIds = new Set<string>();
                             }
+
+                            // ברירת מחדל: לסגור את הילדים של האחים (כלומר שרק האחים יוצגו, והשאר סגור)
+                            if (d !== parentHierarchy) {
+                                const spouses = d.data.spouses || [];
+                                const totalMembers = [d.data, ...spouses];
+                                totalMembers.forEach((member: any) => {
+                                     const trackId = member.id ? String(member.id) : 'main';
+                                     d.collapsedSpouseIds.add(trackId);
+                                });
+                            }
+
+                            // עדכון ה-children שיוצגו בפועל
+                            if (d.allChildNodes.length > 0) {
+                                const visibleChildren = d.allChildNodes.filter((childNode: any) => {
+                                    const childData = childNode.data as FamilyMember;
+                                    let parentId = childData.otherParentId ? String(childData.otherParentId) : '';
+                                    if (!parentId) {
+                                        parentId = d.data.id ? String(d.data.id) : 'main'; 
+                                    }
+                                    return !d.collapsedSpouseIds.has(parentId);
+                                });
+                                d.children = visibleChildren.length > 0 ? visibleChildren : undefined;
+                            }
                         });
                         return parentHierarchy;
                     });
@@ -506,14 +533,14 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
 
                 cachedHierarchies.forEach((parentHierarchy: HierarchyNode) => {
                     const miniTree = d3.tree<FamilyMember>()
-                        .nodeSize([140, 200])
+                        .nodeSize([105, 250])
                         .separation((a, b) => {
                             const aSpouses = a.data.spouses?.length || 0;
                             const bSpouses = b.data.spouses?.length || 0;
                             const aWidth = 1 + (aSpouses * 0.9);
                             const bWidth = 1 + (bSpouses * 0.9);
-                            const sep = (aWidth + bWidth) / 2 + 0.15;
-                            return a.parent === b.parent ? sep : sep + 0.2;
+                            const sep = (aWidth + bWidth) / 2;
+                            return a.parent === b.parent ? sep : sep + 0.5;
                         })(parentHierarchy);
 
                     const miniNodes = miniTree.descendants();
@@ -521,9 +548,9 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                     // קביעת כיוון ההזזה (ימינה אם אנחנו בצד ימין של העץ, שמאלה אם בשמאל)
                     const direction = node.x >= 0 ? 1 : -1;
                     let dx = spouseAbsX - miniTree.x;
-                    const dy = spouseAbsY - 200;
+                    const dy = spouseAbsY - 260; // הוגדל מ-200 ל-260 כדי להתרחק מהאדם הנוכחי
 
-                    // מנגנון מניעת התנגשויות (Collision Resolution)
+                    // מנגנון מניעת התנגשויות (Collision Resolution) הגדלתי את מרחקי הבדיקה
                     let collision = true;
                     let attempts = 0;
                     while (collision && attempts < 50) {
@@ -533,9 +560,10 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                             const mY = mNode.y + dy;
 
                             // בדיקה מול כל הצמתים שכבר מוקמו (כולל העץ הראשי ועצים משניים קודמים)
-                            for (const eNode of nodes) {
-                                if (Math.abs(mY - eNode.y) < NODE_HEIGHT) {
-                                    if (Math.abs(mX - eNode.x) < NODE_WIDTH) {
+                            for (const eNode of nodes) {                                
+                                if (Math.abs(mY - eNode.y) < this.NODE_HEIGHT * 1.5) { 
+                                    // מרווח ביטחון אופקי משמעותי כדי שמשפחת המקור לא תעלה על ענפים אחרים
+                                    if (Math.abs(mX - eNode.x) < (this.NODE_WIDTH * 3.5)) { 
                                         collision = true;
                                         break;
                                     }
@@ -544,7 +572,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                             if (collision) break;
                         }
                         if (collision) {
-                            dx += direction * 60; // הזזה של 60 פיקסלים ובדיקה מחדש
+                            dx += direction * 350; // הוגדל מ-250 ל-350 כדי לתת דחיפה משמעותית הצידה
                             attempts++;
                         }
                     }

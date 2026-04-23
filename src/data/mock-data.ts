@@ -31,6 +31,50 @@ export interface FamilyMember extends Omit<FamilyMemberDTO, 'children' | 'spouse
 
 export const FAMILY_DATA: FamilyMemberDTO[] = 
 [
+  { "id": 1000001, "tz": "1000001", "name": "דן וייל", "gender": "זכר", "birthDate": "1990-01-01", "address": "הכבאים 13, רמת גן", "parent1": 3928788, "parent2": 9061375, "Level": -1 },
+  { "id": 1000002, "tz": "1000002", "name": "מאיה וייל", "gender": "נקבה", "birthDate": "1992-05-05", "address": "הכבאים 13, רמת גן", "parent1": 3928788, "parent2": 9061375, "Level": -1 },
+
+  { "id": 1000101, "tz": "1000101", "name": "משה מושקוביץ", "gender": "זכר", "birthDate": "1980-01-01", "address": "רמת גן", "parent1": 9680526, "parent2": 8840116, "Level": -1, "spouses": [{ "id": 1000102 }], "children": [{ "id": 1000111, "parent": 1 }, { "id": 1000112, "parent": 1 }, { "id": 1000113, "parent": 1 }, { "id": 1000114, "parent": 1 }, { "id": 1000115, "parent": 1 }] },
+  { "id": 1000102, "tz": "1000102", "name": "שרה מושקוביץ", "gender": "נקבה", "birthDate": "1981-01-01", "address": "רמת גן", "Level": -1, "spouses": [{ "id": 1000101 }] },
+  { "id": 1000111, "tz": "1000111", "name": "ילד 1 למשה", "gender": "זכר", "birthDate": "2005-01-01", "address": "רמת גן", "parent1": 1000101, "Level": 0 },
+  { "id": 1000112, "tz": "1000112", "name": "ילד 2 למשה", "gender": "נקבה", "birthDate": "2006-01-01", "address": "רמת גן", "parent1": 1000101, "Level": 0 },
+  { "id": 1000113, "tz": "1000113", "name": "ילד 3 למשה", "gender": "זכר", "birthDate": "2007-01-01", "address": "רמת גן", "parent1": 1000101, "Level": 0 },
+  { "id": 1000114, "tz": "1000114", "name": "ילד 4 למשה", "gender": "נקבה", "birthDate": "2008-01-01", "address": "רמת גן", "parent1": 1000101, "Level": 0 },
+  { "id": 1000115, "tz": "1000115", "name": "ילד 5 למשה", "gender": "זכר", "birthDate": "2009-01-01", "address": "רמת גן", "parent1": 1000101, "Level": 0 },
+
+  { "id": 1000201, "tz": "1000201", "name": "דוד מושקוביץ", "gender": "זכר", "birthDate": "1982-01-01", "address": "רמת גן", "parent1": 9680526, "parent2": 8840116, "Level": -1, "spouses": [{ "id": 1000202 }, { "id": 1000203 }], "children": [{ "id": 1000211, "parent": 1 }, { "id": 1000212, "parent": 1 }, { "id": 1000213, "parent": 1 }, { "id": 1000214, "parent": 1 }, { "id": 1000215, "parent": 1 }] },
+  { "id": 1000202, "tz": "1000202", "name": "רחל מושקוביץ", "gender": "נקבה", "birthDate": "1983-01-01", "address": "רמת גן", "Level": -1, "spouses": [{ "id": 1000201 }] },
+  { "id": 1000203, "tz": "1000203", "name": "דינה מושקוביץ", "gender": "נקבה", "birthDate": "1985-05-05", "address": "רמת גן", "Level": -1, "spouses": [{ "id": 1000201 }] },
+  { "id": 1000211, "tz": "1000211", "name": "ילד 1 לדוד", "gender": "זכר", "birthDate": "2006-01-01", "address": "רמת גן", "parent1": 1000201, "Level": 0 },
+  { "id": 1000212, "tz": "1000212", "name": "ילד 2 לדוד", "gender": "נקבה", "birthDate": "2007-01-01", "address": "רמת גן", "parent1": 1000201, "Level": 0 },
+  { "id": 1000213, "tz": "1000213", "name": "ילד 3 לדוד", "gender": "זכר", "birthDate": "2008-01-01", "address": "רמת גן", "parent1": 1000201, "Level": 0 },
+  { "id": 1000214, "tz": "1000214", "name": "ילד 4 לדוד", "gender": "נקבה", "birthDate": "2009-01-01", "address": "רמת גן", "parent1": 1000201, "Level": 0 },
+  { "id": 1000215, "tz": "1000215", "name": "ילד 5 לדוד", "gender": "זכר", "birthDate": "2010-01-01", "address": "רמת גן", "parent1": 1000201, "Level": 0 },
+
+  { "id": 1000301, "tz": "1000301", "name": "יעל לוי (מושקוביץ)", "gender": "נקבה", "birthDate": "1985-01-01", "address": "רמת גן", "parent1": 9680526, "parent2": 8840116, "Level": -1, "spouses": [{ "id": 1000302 }], "children": [{ "id": 1000311, "parent": 2 }, { "id": 1000312, "parent": 2 }, { "id": 1000313, "parent": 2 }, { "id": 1000314, "parent": 2 }, { "id": 1000315, "parent": 2 }] },
+  { "id": 1000302, "tz": "1000302", "name": "אבי לוי", "gender": "זכר", "birthDate": "1984-01-01", "address": "רמת גן", "Level": -1, "spouses": [{ "id": 1000301 }] },
+  { "id": 1000311, "tz": "1000311", "name": "ילד 1 ליעל", "gender": "זכר", "birthDate": "2010-01-01", "address": "רמת גן", "parent1": 1000301, "parent2": 1000302, "Level": 0 },
+  { "id": 1000312, "tz": "1000312", "name": "ילד 2 ליעל", "gender": "נקבה", "birthDate": "2011-01-01", "address": "רמת גן", "parent1": 1000301, "parent2": 1000302, "Level": 0 },
+  { "id": 1000313, "tz": "1000313", "name": "ילד 3 ליעל", "gender": "זכר", "birthDate": "2012-01-01", "address": "רמת גן", "parent1": 1000301, "parent2": 1000302, "Level": 0 },
+  { "id": 1000314, "tz": "1000314", "name": "ילד 4 ליעל", "gender": "נקבה", "birthDate": "2013-01-01", "address": "רמת גן", "parent1": 1000301, "parent2": 1000302, "Level": 0 },
+  { "id": 1000315, "tz": "1000315", "name": "ילד 5 ליעל", "gender": "זכר", "birthDate": "2014-01-01", "address": "רמת גן", "parent1": 1000301, "parent2": 1000302, "Level": 0 },
+
+  { "id": 1000401, "tz": "1000401", "name": "מיכל כהן (מושקוביץ)", "gender": "נקבה", "birthDate": "1992-01-01", "address": "רמת גן", "parent1": 9680526, "parent2": 8840116, "Level": -1, "spouses": [{ "id": 1000402 }], "children": [{ "id": 1000411, "parent": 2 }, { "id": 1000412, "parent": 2 }, { "id": 1000413, "parent": 2 }, { "id": 1000414, "parent": 2 }, { "id": 1000415, "parent": 2 }] },
+  { "id": 1000402, "tz": "1000402", "name": "בן כהן", "gender": "זכר", "birthDate": "1990-01-01", "address": "רמת גן", "Level": -1, "spouses": [{ "id": 1000401 }] },
+  { "id": 1000411, "tz": "1000411", "name": "ילד 1 למיכל", "gender": "זכר", "birthDate": "2015-01-01", "address": "רמת גן", "parent1": 1000401, "parent2": 1000402, "Level": 0 },
+  { "id": 1000412, "tz": "1000412", "name": "ילד 2 למיכל", "gender": "נקבה", "birthDate": "2016-01-01", "address": "רמת גן", "parent1": 1000401, "parent2": 1000402, "Level": 0 },
+  { "id": 1000413, "tz": "1000413", "name": "ילד 3 למיכל", "gender": "זכר", "birthDate": "2017-01-01", "address": "רמת גן", "parent1": 1000401, "parent2": 1000402, "Level": 0 },
+  { "id": 1000414, "tz": "1000414", "name": "ילד 4 למיכל", "gender": "נקבה", "birthDate": "2018-01-01", "address": "רמת גן", "parent1": 1000401, "parent2": 1000402, "Level": 0 },
+  { "id": 1000415, "tz": "1000415", "name": "ילד 5 למיכל", "gender": "זכר", "birthDate": "2019-01-01", "address": "רמת גן", "parent1": 1000401, "parent2": 1000402, "Level": 0 },
+
+  { "id": 1000501, "tz": "1000501", "name": "תומר מושקוביץ", "gender": "זכר", "birthDate": "1996-01-01", "address": "רמת גן", "parent1": 9680526, "parent2": 8840116, "Level": -1, "spouses": [{ "id": 1000502 }], "children": [{ "id": 1000511, "parent": 1 }, { "id": 1000512, "parent": 1 }, { "id": 1000513, "parent": 1 }, { "id": 1000514, "parent": 1 }, { "id": 1000515, "parent": 1 }] },
+  { "id": 1000502, "tz": "1000502", "name": "דנה מושקוביץ", "gender": "נקבה", "birthDate": "1997-01-01", "address": "רמת גן", "Level": -1, "spouses": [{ "id": 1000501 }] },
+  { "id": 1000511, "tz": "1000511", "name": "ילד 1 לתומר", "gender": "זכר", "birthDate": "2020-01-01", "address": "רמת גן", "parent1": 1000501, "parent2": 1000502, "Level": 0 },
+  { "id": 1000512, "tz": "1000512", "name": "ילד 2 לתומר", "gender": "נקבה", "birthDate": "2021-01-01", "address": "רמת גן", "parent1": 1000501, "parent2": 1000502, "Level": 0 },
+  { "id": 1000513, "tz": "1000513", "name": "ילד 3 לתומר", "gender": "זכר", "birthDate": "2022-01-01", "address": "רמת גן", "parent1": 1000501, "parent2": 1000502, "Level": 0 },
+  { "id": 1000514, "tz": "1000514", "name": "ילד 4 לתומר", "gender": "נקבה", "birthDate": "2023-01-01", "address": "רמת גן", "parent1": 1000501, "parent2": 1000502, "Level": 0 },
+  { "id": 1000515, "tz": "1000515", "name": "ילד 5 לתומר", "gender": "זכר", "birthDate": "2024-01-01", "address": "רמת גן", "parent1": 1000501, "parent2": 1000502, "Level": 0 },
+  
   {
     "id": 3928788,
     "tz": "12015111",
@@ -40,6 +84,8 @@ export const FAMILY_DATA: FamilyMemberDTO[] =
     "address": "הכבאים 13, רמת גן",
     "spouses": [ { "id": 9061375 } ],
     "children": [
+      { "id": 1000001, "parent": 1 },
+      { "id": 1000002, "parent": 1 },
       { "id": 2068315, "parent": 1 },
       { "id": 2528413, "parent": 1 },
       { "id": 5008702, "parent": 1 },
@@ -56,6 +102,8 @@ export const FAMILY_DATA: FamilyMemberDTO[] =
     "address": "הכבאים 13, רמת גן",
     "spouses": [ { "id": 3928788 } ],
     "children": [
+      { "id": 1000001, "parent": 2 },
+      { "id": 1000002, "parent": 2 },
       { "id": 2068315, "parent": 2 },
       { "id": 2528413, "parent": 2 },
       { "id": 5008702, "parent": 2 },
@@ -72,6 +120,11 @@ export const FAMILY_DATA: FamilyMemberDTO[] =
     "address": "המלך יוסף 46, רמת גן",
     "spouses": [ { "id": 9680526 } ],
     "children": [
+      { "id": 1000101, "parent": 2 },
+      { "id": 1000201, "parent": 2 },
+      { "id": 1000301, "parent": 2 },
+      { "id": 1000401, "parent": 2 },
+      { "id": 1000501, "parent": 2 },
       { "id": 3743747, "parent": 2 },
       { "id": 4244330, "parent": 2 },
       { "id": 6744884, "parent": 2 },
@@ -88,6 +141,11 @@ export const FAMILY_DATA: FamilyMemberDTO[] =
     "address": "המלך יוסף 46, דירה 1, רמת גן",
     "spouses": [ { "id": 8840116 } ],
     "children": [
+      { "id": 1000101, "parent": 1 },
+      { "id": 1000201, "parent": 1 },
+      { "id": 1000301, "parent": 1 },
+      { "id": 1000401, "parent": 1 },
+      { "id": 1000501, "parent": 1 },
       { "id": 3743747, "parent": 1 },
       { "id": 4244330, "parent": 1 },
       { "id": 6744884, "parent": 1 },
@@ -120,6 +178,40 @@ export const FAMILY_DATA: FamilyMemberDTO[] =
     ],
     "parent1": 3928788,
     "parent2": 9061375,
+    "Level": -1
+  },
+   {
+    "id": 2068315,
+    "tz": "038155073",
+    "name": "אלון וייל",
+    "gender": "זכר",
+    "birthDate": "1986-01-25",
+    "address": "הכבאים 13, דירה 16, רמת גן",
+    "spouses": [ { "id": 6744884 } ],
+    "children": [
+      { "id": 15260362, "parent": 1 },
+      { "id": 16477946, "parent": 1 },
+      { "id": 20649572, "parent": 1 }
+    ],
+    "parent1": 3928788,
+    "parent2": 9061375,
+    "Level": -1
+  },
+  {
+    "id": 6744884,
+    "tz": "32533937",
+    "name": "לי-טל וייל",
+    "gender": "נקבה",
+    "birthDate": "1986-08-10",
+    "address": "הכבאים 13, דירה 16, רמת גן",
+    "spouses": [ { "id": 2068315 } ],
+    "children": [
+      { "id": 15260362, "parent": 2 },
+      { "id": 16477946, "parent": 2 },
+      { "id": 20649572, "parent": 2 }
+    ],
+    "parent1": 9680526,
+    "parent2": 8840116,
     "Level": -1
   },
   {
@@ -191,40 +283,7 @@ export const FAMILY_DATA: FamilyMemberDTO[] =
     "parent2": 8840116,
     "Level": -1
   },
-  {
-    "id": 2068315,
-    "tz": "38155073",
-    "name": "אלון וייל",
-    "gender": "זכר",
-    "birthDate": "1986-01-25",
-    "address": "הכבאים 13, דירה 16, רמת גן",
-    "spouses": [ { "id": 6744884 } ],
-    "children": [
-      { "id": 15260362, "parent": 1 },
-      { "id": 16477946, "parent": 1 },
-      { "id": 20649572, "parent": 1 }
-    ],
-    "parent1": 3928788,
-    "parent2": 9061375,
-    "Level": -1
-  },
-  {
-    "id": 6744884,
-    "tz": "32533937",
-    "name": "לי-טל וייל",
-    "gender": "נקבה",
-    "birthDate": "1986-08-10",
-    "address": "הכבאים 13, דירה 16, רמת גן",
-    "spouses": [ { "id": 2068315 } ],
-    "children": [
-      { "id": 15260362, "parent": 2 },
-      { "id": 16477946, "parent": 2 },
-      { "id": 20649572, "parent": 2 }
-    ],
-    "parent1": 9680526,
-    "parent2": 8840116,
-    "Level": -1
-  },
+ 
   {
     "id": 4244330,
     "tz": "200331304",

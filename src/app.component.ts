@@ -28,8 +28,8 @@ export class AppComponent {
   searchControl = new FormControl('');
 
   onSearch() {
-    if(this.searchControl.value?.startsWith('0')){
-      this.searchControl.patchValue(this.searchControl.value.substring(1));
+    if(this.searchControl.value?.length < 9){
+      this.searchControl.patchValue(this.searchControl.value?.padStart(9,'0'));
     }
     const tz = this.searchControl.value?.trim();
     if (!tz) return;
