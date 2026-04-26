@@ -108,20 +108,34 @@ export function buildTreeFromFlat(members: FamilyMemberDTO[], searchedTz: string
     });
 
     // Hydrate spouses
+    const spouseIds = new Set<number>();
     if (member.spouses && member.spouses.length > 0) {
       member.spouses.forEach((spousePtr: any) => {
         const spouseId = typeof spousePtr === 'object' && spousePtr !== null ? spousePtr.id : spousePtr;
-        if (!visitedIds.has(spouseId) && memberMap.has(spouseId)) {
-          const spouseMember = memberMap.get(spouseId)!;
-          const spouseNode = hydrate(spouseMember, new Set(visitedIds));
-          
-          // Spouse children? In our visual tree, children are usually attached to the primary parent.
-          node.spouses!.push(spouseNode);
-        } else if (createdNodes.has(spouseId)) {
-          node.spouses!.push(createdNodes.get(spouseId)!);
-        }
+        spouseIds.add(spouseId);
       });
     }
+
+    // Inferred spouses (shared parents)
+    childrenMembers.forEach(child => {
+      if (child.parent1 && child.parent1 !== member.id) spouseIds.add(child.parent1);
+      if (child.parent2 && child.parent2 !== member.id) spouseIds.add(child.parent2);
+    });
+
+    spouseIds.forEach(spouseId => {
+      if (spouseId === member.id) return;
+      if (!visitedIds.has(spouseId) && memberMap.has(spouseId)) {
+        const spouseMember = memberMap.get(spouseId)!;
+        const spouseNode = hydrate(spouseMember, new Set(visitedIds));
+        
+        // Spouse children? In our visual tree, children are usually attached to the primary parent.
+        node.spouses!.push(spouseNode);
+      } else if (createdNodes.has(spouseId)) {
+        if (!node.spouses!.some(s => s.id === spouseId)) {
+          node.spouses!.push(createdNodes.get(spouseId)!);
+        }
+      }
+    });
 
     return node;
   }

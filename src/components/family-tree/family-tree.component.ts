@@ -785,7 +785,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
 
             // 3. טקסט (שם ותאריך) באמצעות ForeignObject
             const foWidth = component.rectW - 4;
-            const foHeight = 50;
+            const foHeight = 65;
             const foX = 2; 
             const foY = imgCy + imgRadius + 5;
 
@@ -812,6 +812,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                     <div style="font-weight: 700; font-size: 13px; color: #374151; margin-bottom: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${member.name}">
                         ${member.name}
                     </div>
+                    ${member.tz ? '<div style="font-size: 10px; color: #4b5563; margin-bottom: 2px;">' + member.tz + '</div>' : ''}
                     <div style="font-size: 11px; color: #6b7280;">
                         ${member.birthDate ? new Date(member.birthDate).getFullYear() : ''}
                     </div>
