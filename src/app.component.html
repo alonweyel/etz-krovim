@@ -49,6 +49,22 @@
         שושלת נקבית
       </button>
     </div>
+    <div class="expand-collapse-controls">
+      <button 
+        (click)="expandAllNodes()"
+        class="circle-action-btn"
+        title="הרחב הכל"
+      >
+        <span>+</span>
+      </button>
+      <button 
+        (click)="collapseAllNodes()"
+        class="circle-action-btn"
+        title="צמצם הכל"
+      >
+        <span style="font-size: 24px; margin-top: -4px;">-</span>
+      </button>
+    </div>
   }
 
   @if (currentData()) {

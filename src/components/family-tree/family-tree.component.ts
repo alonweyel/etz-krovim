@@ -996,7 +996,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // לוגיקה להצגה/הסתרה של ילדים (Collapsing)
+  // לוגיקה להצגה/הסתרה של חלק מהילדים
   private toggleSpouseChildren(d: HierarchyNode, spouseId: string) {
     if (!d.allChildNodes || !d.collapsedSpouseIds) return;
 
@@ -1023,6 +1023,60 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     }
 
     this.update(this.root); // ציור מחדש מהשורש כדי לטפל גם בעצים משניים
+  }
+
+  // פעולות כלליות
+  expandAll() {
+    if (!this.root) return;
+
+    const traverseAndExpand = (d: HierarchyNode) => {
+      if (d.allChildNodes) {
+        d.collapsedSpouseIds?.clear();
+        d.children = d.allChildNodes.length > 0 ? [...d.allChildNodes] : undefined;
+        d.allChildNodes.forEach(child => traverseAndExpand(child));
+      }
+    };
+
+    traverseAndExpand(this.root);
+
+    this.miniTreeHierarchies.forEach(trees => {
+      trees.forEach(tree => {
+        traverseAndExpand(tree);
+      });
+    });
+
+    this.update(this.root);
+  }
+
+  collapseAll() {
+    if (!this.root) return;
+
+    const traverseAndCollapse = (d: HierarchyNode) => {
+      if (d.allChildNodes && d.allChildNodes.length > 0) {
+        if (!d.collapsedSpouseIds) d.collapsedSpouseIds = new Set<string>();
+        
+        const spouses = d.data.spouses || [];
+        const totalMembers = [d.data, ...spouses];
+        
+        totalMembers.forEach(member => {
+          const trackId = member.id ? String(member.id) : 'main';
+          d.collapsedSpouseIds!.add(trackId);
+        });
+        
+        d.children = undefined;
+        d.allChildNodes.forEach(child => traverseAndCollapse(child));
+      }
+    };
+
+    traverseAndCollapse(this.root);
+
+    this.miniTreeHierarchies.forEach(trees => {
+      trees.forEach(tree => {
+        traverseAndCollapse(tree);
+      });
+    });
+
+    this.update(this.root);
   }
 
   // לוגיקה להצגה/הסתרה של משפחת המקור של בן/בת הזוג

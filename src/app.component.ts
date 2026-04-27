@@ -1,4 +1,4 @@
-import { Component, signal, ViewEncapsulation, inject } from '@angular/core';
+import { Component, signal, ViewEncapsulation, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { FamilyTreeComponent } from './components/family-tree/family-tree.component';
@@ -17,6 +17,8 @@ import { buildTreeFromFlat } from './services/tree-builder';
 export class AppComponent {
   private familyService = inject(FamilyService);
   
+  @ViewChild(FamilyTreeComponent) familyTreeComponent!: FamilyTreeComponent;
+
   currentData = signal<FamilyMember | null>(null);
   FAMILY_DATA = signal<FamilyMember | null>(null);
   MALE_ONLY_DATA = signal<FamilyMember | null>(null);
@@ -70,6 +72,18 @@ export class AppComponent {
       this.currentData.set(this.MALE_ONLY_DATA());
     } else {
       this.currentData.set(this.FEMALE_ONLY_DATA());
+    }
+  }
+
+  expandAllNodes() {
+    if (this.familyTreeComponent) {
+      this.familyTreeComponent.expandAll();
+    }
+  }
+
+  collapseAllNodes() {
+    if (this.familyTreeComponent) {
+      this.familyTreeComponent.collapseAll();
     }
   }
 }
