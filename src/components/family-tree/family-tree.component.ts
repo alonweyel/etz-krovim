@@ -92,62 +92,19 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
   private NODE_HEIGHT = 200;
 
   constructor() {
-    // אפקט שמגיב לשינויים במידע הנכנס (rootData) ומצייר מחדש את העץ
+    // אפקט שמגיב לחיפוש חדש או למידע חדש
     effect(() => {
       const data = this.rootData();
-      // מוודא שה-SVG כבר קיים לפני שמנסים לצייר
+      const tz = this.searchedTz(); // המעקב אחרי שינוי בחיפוש יפעיל את האפקט
+      
       if (this.svg && data) {
+        // סגירת חלונית צד על כל חיפוש או טעינה מחדש
+        this.closeDetails();
+        // ניקוי משפחות בני זוג פתוחות
+        this.expandedSpouseFamilies.clear();
+        
+        // יצירה וציור מחדש משורש כדי לוודא שאינטראקציות קודמות מתאפסות
         this.initializeTree(data);
-      }
-    });
-
-    // אפקט שמגיב לחיפוש תעודת זהות חדשה
-    effect(() => {
-      const tz = this.searchedTz();
-      if (this.svg && this.root && tz) {
-        
-        // מציאת הצומת (כולל חיפוש בילדים מוסתרים)
-        let searchedNode: HierarchyNode | undefined;
-        
-        const findNode = (node: HierarchyNode) => {
-          if (node.data.tz?.trim() === tz) {
-            searchedNode = node;
-            return;
-          }
-          if (node.data.spouses && node.data.spouses.some(s => s.tz?.trim() === tz)) {
-            searchedNode = node;
-            return;
-          }
-          if (node.allChildNodes) {
-            for (const child of node.allChildNodes) {
-              findNode(child);
-              if (searchedNode) return;
-            }
-          }
-        };
-        
-        findNode(this.root);
-
-        if (searchedNode) {
-          // פתיחת כל ההורים המוסתרים בדרך לצומת
-          let current = searchedNode.parent;
-          while (current) {
-            if (current.collapsedSpouseIds && current.collapsedSpouseIds.size > 0) {
-               current.collapsedSpouseIds.clear();
-               current.children = current.allChildNodes;
-            }
-            current = current.parent;
-          }
-        }
-
-        // רענון העץ כדי להחיל את המחלקה המודגשת ולפתוח צמתים אם צריך
-        this.update(this.root);
-
-        if (searchedNode) {
-          setTimeout(() => {
-            this.centerOnNode(searchedNode!);
-          }, 100);
-        }
       }
     });
   }
