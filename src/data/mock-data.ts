@@ -31,39 +31,160 @@ export interface FamilyMember extends Omit<FamilyMemberDTO, 'children' | 'spouse
 
 export const FAMILY_DATA: FamilyMemberDTO[] = [
   {
-    "id": 6282779,
-    "tz": "004501136",
-    "name": "יהודית פזאל",
-    "gender": "נקבה",
-    "birthDate": "1960-10-18",
-    "address": "המלך יוסף 46, רמת גן",
-    "spouses": [ { "id": 9394301 } ],
-    "children": [
-      { "id": 12188643, "parent": 2 },      
-    ],
-    "Level": -1
-  },
-  {
-    "id": 4493319,
-    "tz": "055352017",
-    "name": "אלי נתן",
+    "id": 1,
+    "tz": "000000001",
+    "name": "סבא",
     "gender": "זכר",
     "birthDate": "1960-10-18",
     "address": "המלך יוסף 46, רמת גן",
+    "spouses": [ { "id": 2 } ],
     "children": [
-      { "id": 12188643, "parent": 2 }, 
+      { "id": 3, "parent": 1 },      
+      { "id": 4, "parent": 1 },    
+    ],
+    "Level": -1
+  },
+    {
+    "id": 2,
+    "tz": "000000002",
+    "name": "סבתא",
+    "gender": "נקבה",
+    "birthDate": "1960-10-18",
+    "address": "המלך יוסף 46, רמת גן",
+    "spouses": [ { "id": 1 } ],
+    "children": [
+      { "id": 3, "parent": 2 },      
+      { "id": 4, "parent": 2 },    
     ],
     "Level": -1
   },
    {
-    "id": 12188643,
-    "tz": "205973126",
-    "name": "ליאב נתן",
+    "id": 3,
+    "tz": "000000003",
+    "name": "אח 1",
     "gender": "זכר",
     "birthDate": "1960-10-18",
     "address": "המלך יוסף 46, רמת גן",
-    "parent1": 4493319,
-    "parent2": 6282779,
+    "spouses": [ { "id": 33 } ],
+    "children": [
+      { "id": 5, "parent": 1 },      
+      { "id": 6, "parent": 1 },    
+    ],
+    "parent1":1,
+    "parent2":2,
+    "Level": -1
+  },
+   {
+    "id": 31,
+    "tz": "000000031",
+    "name": "אבא של אשת אח 1",
+    "gender": "זכר",
+    "birthDate": "1960-10-18",
+    "address": "המלך יוסף 46, רמת גן",
+    "spouses": [ { "id": 32 } ],
+    "children": [
+      { "id": 33, "parent": 1 },  
+      ],
+    "Level": -1
+  },
+   {
+    "id": 32,
+    "tz": "000000032",
+    "name": "אמא של אשת אח 1",
+    "gender": "נקבה",
+    "birthDate": "1960-10-18",
+    "address": "המלך יוסף 46, רמת גן",
+    "spouses": [ { "id": 31 } ],
+    "children": [
+      { "id": 33, "parent": 2 },        
+    ],
+    "Level": -1
+  },
+     {
+    "id": 33,
+    "tz": "000000033",
+    "name": "אשת אח 1",
+    "gender": "נקבה",
+    "birthDate": "1960-10-18",
+    "address": "המלך יוסף 46, רמת גן",
+    "spouses": [ { "id": 3 } ],
+    "children": [
+      { "id": 5, "parent": 2 },      
+      { "id": 6, "parent": 2 },    
+    ],
+    "parent1": 31,
+    "parent2": 32,
+    "Level": -1
+  },
+     {
+    "id": 4,
+    "tz": "000000004",
+    "name": "אח 2",
+    "gender": "זכר",
+    "birthDate": "1960-10-18",
+    "address": "המלך יוסף 46, רמת גן",
+    "children": [
+      { "id": 7, "parent": 1 },      
+      { "id": 8, "parent": 1 },    
+    ],
+    "parent1":1,
+    "parent2":2,
+    "Level": -1
+  },
+  {
+    "id": 5,
+    "tz": "000000005",
+    "name": "בן אח 1",
+    "gender": "זכר",
+    "birthDate": "1960-10-18",
+    "address": "המלך יוסף 46, רמת גן",
+    "spouses": [ { "id": 7 } ],
+    "parent1":3,
+    "parent2":33,
+    "Level": -1
+  },
+    {
+    "id": 6,
+    "tz": "000000006",
+    "name": "בן 2 אח 1",
+    "gender": "זכר",
+    "birthDate": "1960-10-18",
+    "address": "המלך יוסף 46, רמת גן",
+    "spouses": [ { "id": 8 } ],
+    "parent1":3,
+    "parent2":33,
+    "Level": -1
+  },
+    {
+    "id": 7,
+    "tz": "000000007",
+    "name": "בת אח 2",
+    "gender": "נקבה",
+    "birthDate": "1960-10-18",
+    "address": "המלך יוסף 46, רמת גן",
+    "spouses": [ { "id": 5 } ],
+    "parent1":4,
+    "Level": -1
+  },
+    {
+    "id": 8,
+    "tz": "000000008",
+    "name": "בת 2 אח 2",
+    "gender": "נקבה",
+    "birthDate": "1960-10-18",
+    "address": "המלך יוסף 46, רמת גן",
+    "spouses": [ { "id": 6 } ],
+    "parent1":4,
+     "Level": -1
+  },
+      {
+    "id": 10,
+    "tz": "000000010",
+    "name": "בת אח 1",
+    "gender": "נקבה",
+    "birthDate": "1960-10-18",
+    "address": "המלך יוסף 46, רמת גן",
+    "parent1":3,
     "Level": -1
   },
 ]

@@ -36,6 +36,9 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
   // סט משפחות בני זוג מורחבות
   expandedSpouseFamilies: Set<number> = new Set();
   
+  // ספירת הופעות של מזהים כדי לדעת איזה אדם מופיע יותר מפעם אחת
+  globalIdCount = new Map<number | string, number>();
+
   // מטמון לשמירת ההיררכיה של העצים המשניים (כדי לשמור על מצב כיווץ/הרחבה)
   private miniTreeHierarchies = new Map<number, any[]>();
 
@@ -320,6 +323,21 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
     // המרת המידע למבנה היררכי של D3
     this.root = d3.hierarchy<FamilyMember>(data, (d) => d.children) as HierarchyNode;
     
+    // ניקוי וספירה מחדש של כפילויות
+    this.globalIdCount.clear();
+    this.root.descendants().forEach((d: HierarchyNode) => {
+        if (d.data.id) {
+            this.globalIdCount.set(d.data.id, (this.globalIdCount.get(d.data.id) || 0) + 1);
+        }
+        if (d.data.spouses) {
+            d.data.spouses.forEach(s => {
+                if (s.id) {
+                    this.globalIdCount.set(s.id, (this.globalIdCount.get(s.id) || 0) + 1);
+                }
+            });
+        }
+    });
+
     const tz = this.searchedTz();
     let searchedNode: HierarchyNode | undefined;
     
@@ -730,7 +748,22 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
             const cardGroup = group.append('g')
                 .attr('class', 'member-card-group') // זיהוי לקליק
                 .attr('transform', `translate(${cardX}, 0)`)
-                .datum(member); // קשירת המידע הספציפי לכרטיס הזה!
+                .attr('data-person-id', member.id || '')
+                .datum(member) // קשירת המידע הספציפי לכרטיס הזה!
+                .on('mouseenter', function() {
+                    if (member.id) {
+                        const duplicates = d3.selectAll(`.member-card-group[data-person-id="${member.id}"]`);
+                        if (duplicates.size() > 1) {
+                            duplicates.select('rect.person-card').classed('duplicate-highlight', true);
+                        }
+                    }
+                })
+                .on('mouseleave', function() {
+                    if (member.id) {
+                        d3.selectAll(`.member-card-group[data-person-id="${member.id}"] rect.person-card`)
+                          .classed('duplicate-highlight', false);
+                    }
+                });
 
             // 1. ציור המלבן (הכרטיס)
             cardGroup.append('rect')
@@ -745,6 +778,17 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
                     const highlightClass = member.tz?.trim() === component.searchedTz() ? ' highlighted' : '';
                     return `person-card ${genderClass}${highlightClass}`;
                 });
+
+            // אינדיקציה לכפילות (מופיע תמיד אם האדם קיים יותר מפעם אחת בעץ המלא)
+            if (member.id && (component.globalIdCount.get(member.id) || 0) > 1) {
+                // אייקון המסמל כפילות (אנשים חופפים - Material Icons 'people')
+                cardGroup.append('path')
+                    .attr('d', 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z')
+                    .attr('transform', `translate(6, ${cardY + 6}) scale(0.8)`)
+                    .attr('fill', '#4caf50') // צבע ירוק תואם להדגשה
+                    .style('pointer-events', 'none')
+                    .append('title').text('אדם זה מופיע יותר מפעם אחת בעץ');
+            }
 
             // 2. תמונת הפרופיל
             const imgRadius = 26;
@@ -892,7 +936,24 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
 
             // 6. כפתור הצגת משפחת מקור (Spouse Family)
             // מציגים רק עבור בני זוג (index > 0) ולא עבור האדם המרכזי בשושלת
+            let showSpouseBtn = false;
             if (index > 0 && member.parents && member.parents.length > 0) {
+                const searchedTz = component.searchedTz();
+                if (searchedTz) {
+                    // Check if member or d.data (the main person) has a child that is the searched person
+                    const isParentOfSearched = member.children?.some(c => c.tz?.trim() === searchedTz) || 
+                                               d.data.children?.some((c:any) => c.tz?.trim() === searchedTz);
+                    
+                    if (isParentOfSearched) {
+                        showSpouseBtn = true;
+                    }
+                } else {
+                    // No search active, show for all spouses with parents (default previous behavior)
+                    showSpouseBtn = true;
+                }
+            }
+
+            if (showSpouseBtn) {
                 const isExpanded = component.expandedSpouseFamilies.has(member.id);
                 const familyBtnX = component.rectW / 2;
                 const familyBtnY = -component.rectH / 2; // Above the card

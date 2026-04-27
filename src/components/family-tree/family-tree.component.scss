@@ -46,6 +46,12 @@
       stroke-width: 4px !important;
       filter: drop-shadow(0px 0px 12px rgba(255, 179, 0, 0.8)) !important;
     }
+
+    &.duplicate-highlight {
+      stroke: #4caf50 !important; /* Green 500 */
+      stroke-width: 4px !important;
+      filter: drop-shadow(0px 0px 12px rgba(76, 175, 80, 0.8)) !important;
+    }
   }
 
   &:hover rect.person-card {
