@@ -47,16 +47,7 @@ export function buildTreeFromFlat(members: FamilyMemberDTO[], searchedTz: string
     }
 
     const node: FamilyMember = {
-      id: member.id,
-      name: member.name,
-      tz: member.tz,
-      gender: member.gender,
-      birthDate: member.birthDate,
-      address: member.address,
-      photo: member.photo,
-      hobbies: member.hobbies,
-      dna: member.dna,
-      ta: member.ta,
+      ...member,
       spouses: [],
       children: [],
       parents: []

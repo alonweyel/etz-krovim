@@ -191,7 +191,7 @@ export class FamilyTreeComponent implements AfterViewInit, OnDestroy {
         spouse.spouses = [node]; // קישור דו-כיווני
         // שיוך ילדים ספציפיים לבן הזוג הזה (לצורך תצוגה בלבד)
         if (node.children) {
-            spouse.children = node.children.filter(child => child.otherParentId === spouse.id);
+            spouse.children = node.children.filter(child => child.parent1 === spouse.id || child.parent2 === spouse.id);
         }
         currentParents.push(spouse);
 
